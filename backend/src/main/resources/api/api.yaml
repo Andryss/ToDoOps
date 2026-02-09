@@ -1,0 +1,362 @@
+openapi: 3.0.3
+info:
+  title: ToDoOps API
+  description: API for managing todo tasks
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8080
+
+tags:
+  - name: tasks
+    description: API for managing todo tasks
+
+paths:
+  /api/v1/tasks:
+    post:
+      summary: Create a new todo task
+      operationId: createTask
+      tags:
+        - tasks
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TaskCreateRequest"
+      responses:
+        200:
+          description: Task created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TaskResponse"
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorObject"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorObject"
+
+    get:
+      summary: List tasks with pagination
+      operationId: listTasks
+      tags:
+        - tasks
+      parameters:
+        - name: page
+          in: query
+          description: Zero-based page index
+          required: false
+          schema:
+            type: integer
+            format: int32
+            minimum: 0
+            default: 0
+        - name: size
+          in: query
+          description: Number of tasks per page
+          required: false
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            maximum: 100
+            default: 20
+      responses:
+        200:
+          description: Paged list of tasks
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TaskPageResponse"
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorObject"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorObject"
+
+  /api/v1/tasks/{id}:
+    get:
+      summary: Get a task by ID
+      operationId: getTask
+      tags:
+        - tasks
+      parameters:
+        - $ref: "#/components/parameters/TaskId"
+      responses:
+        200:
+          description: Task found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TaskResponse"
+        400:
+          description: Bad request or not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorObject"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorObject"
+
+    put:
+      summary: Update a task
+      operationId: updateTask
+      tags:
+        - tasks
+      parameters:
+        - $ref: "#/components/parameters/TaskId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TaskUpdateRequest"
+      responses:
+        200:
+          description: Task updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TaskResponse"
+        400:
+          description: Bad request or not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorObject"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorObject"
+
+    delete:
+      summary: Delete a task
+      operationId: deleteTask
+      tags:
+        - tasks
+      parameters:
+        - $ref: "#/components/parameters/TaskId"
+      responses:
+        200:
+          description: Task deleted successfully
+        400:
+          description: Bad request or not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorObject"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorObject"
+
+  /api/v1/tasks/{id}/status:
+    patch:
+      summary: Change task status
+      operationId: changeTaskStatus
+      tags:
+        - tasks
+      parameters:
+        - $ref: "#/components/parameters/TaskId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TaskStatusRequest"
+      responses:
+        200:
+          description: Task status updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TaskResponse"
+        400:
+          description: Bad request or not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorObject"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorObject"
+
+components:
+  parameters:
+    TaskId:
+      name: id
+      in: path
+      required: true
+      schema:
+        $ref: "#/components/schemas/TaskId"
+
+  schemas:
+    TaskTitle:
+      type: string
+      description: Task title
+      minLength: 1
+      example: "Implement API"
+
+    TaskDescription:
+      type: string
+      description: Task description
+      example: "Add OpenAPI spec and implement endpoints"
+
+    DueDate:
+      type: string
+      format: date-time
+      description: Due date for the task
+      nullable: true
+      example: "2025-02-15T23:59:59Z"
+
+    TaskStatus:
+      type: string
+      description: Task status
+      enum:
+        - NEW
+        - IN_PROGRESS
+        - COMPLETED
+      example: "NEW"
+
+    TaskId:
+      type: string
+      description: Task ID
+      example: "69585922bcd51bd5318d00be"
+
+    CreatedAt:
+      type: string
+      format: date-time
+      description: Task creation timestamp
+      example: "2025-02-09T12:00:00Z"
+
+    TaskCreateRequest:
+      description: Request object for creating a todo task
+      type: object
+      required:
+        - title
+      properties:
+        title:
+          $ref: "#/components/schemas/TaskTitle"
+        description:
+          $ref: "#/components/schemas/TaskDescription"
+        status:
+          $ref: "#/components/schemas/TaskStatus"
+        due_date:
+          $ref: "#/components/schemas/DueDate"
+
+    TaskUpdateRequest:
+      description: Request object for updating a task (title, description, due_date)
+      type: object
+      properties:
+        title:
+          $ref: "#/components/schemas/TaskTitle"
+        description:
+          $ref: "#/components/schemas/TaskDescription"
+        due_date:
+          $ref: "#/components/schemas/DueDate"
+
+    TaskStatusRequest:
+      description: Request object for changing task status
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          $ref: "#/components/schemas/TaskStatus"
+
+    TaskResponse:
+      description: Response object representing a todo task
+      type: object
+      required:
+        - id
+        - title
+        - description
+        - status
+        - created_at
+        - due_date
+      properties:
+        id:
+          $ref: "#/components/schemas/TaskId"
+        title:
+          $ref: "#/components/schemas/TaskTitle"
+        description:
+          $ref: "#/components/schemas/TaskDescription"
+        status:
+          $ref: "#/components/schemas/TaskStatus"
+        created_at:
+          $ref: "#/components/schemas/CreatedAt"
+        due_date:
+          $ref: "#/components/schemas/DueDate"
+
+    TaskPageResponse:
+      description: Paged list of tasks
+      type: object
+      required:
+        - content
+        - totalElements
+        - totalPages
+        - size
+        - number
+      properties:
+        content:
+          type: array
+          description: List of tasks on the current page
+          items:
+            $ref: "#/components/schemas/TaskResponse"
+        totalElements:
+          type: integer
+          format: int64
+          description: Total number of tasks
+        totalPages:
+          type: integer
+          format: int32
+          description: Total number of pages
+        size:
+          type: integer
+          format: int32
+          description: Page size
+        number:
+          type: integer
+          format: int32
+          description: Current page index (zero-based)
+
+    ErrorObject:
+      description: Error response object
+      type: object
+      properties:
+        code:
+          description: Numeric error code
+          type: integer
+          format: int32
+        message:
+          description: Unique text identifier of the error
+          type: string
+        humanMessage:
+          description: Human-readable error description
+          type: string
