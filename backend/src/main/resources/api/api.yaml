@@ -221,11 +221,13 @@ components:
       type: string
       description: Task title
       minLength: 1
+      maxLength: 200
       example: "Implement API"
 
     TaskDescription:
       type: string
       description: Task description
+      maxLength: 4000
       example: "Add OpenAPI spec and implement endpoints"
 
     DueDate:
@@ -245,9 +247,10 @@ components:
       example: "NEW"
 
     TaskId:
-      type: string
+      type: integer
+      format: int64
       description: Task ID
-      example: "69585922bcd51bd5318d00be"
+      example: 1
 
     CreatedAt:
       type: string
@@ -256,23 +259,25 @@ components:
       example: "2025-02-09T12:00:00Z"
 
     TaskCreateRequest:
-      description: Request object for creating a todo task
+      description: Request object for creating a todo task (created in NEW status)
       type: object
       required:
         - title
+        - description
       properties:
         title:
           $ref: "#/components/schemas/TaskTitle"
         description:
           $ref: "#/components/schemas/TaskDescription"
-        status:
-          $ref: "#/components/schemas/TaskStatus"
         due_date:
           $ref: "#/components/schemas/DueDate"
 
     TaskUpdateRequest:
       description: Request object for updating a task (title, description, due_date)
       type: object
+      required:
+        - title
+        - description
       properties:
         title:
           $ref: "#/components/schemas/TaskTitle"
