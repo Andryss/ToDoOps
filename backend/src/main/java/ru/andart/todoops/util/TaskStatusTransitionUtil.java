@@ -9,7 +9,6 @@ import java.util.Set;
 
 /**
  * Utility for task status transition rules.
- * Allowed flow: NEW -> IN_PROGRESS -> COMPLETED.
  */
 public final class TaskStatusTransitionUtil {
 
