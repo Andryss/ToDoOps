@@ -18,7 +18,14 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
-          cache: maven
+
+      - name: Cache Maven packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-maven-build-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-build-
 
       - name: Build
         run: mvn clean package -DskipTests
@@ -37,7 +44,14 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
-          cache: maven
+
+      - name: Cache Maven packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-maven-test-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-test-
 
       - name: Run tests
         run: mvn test
