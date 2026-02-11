@@ -5,6 +5,7 @@ import java.time.OffsetDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
 import ru.andart.todoops.entity.TaskEntity;
@@ -56,7 +57,7 @@ public class TaskService {
      */
     public Page<TaskEntity> list(int page, int size) {
         return readOnlyTransactionTemplate.execute(status ->
-                taskRepository.findAll(PageRequest.of(page, size)));
+                taskRepository.findAll(PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "id"))));
     }
 
     /**
