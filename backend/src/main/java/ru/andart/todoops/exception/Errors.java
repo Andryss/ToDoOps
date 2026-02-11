@@ -16,7 +16,7 @@ public final class Errors {
     }
 
     /**
-     * Invalid status transition (only NEW -> IN_PROGRESS -> COMPLETED allowed).
+     * Invalid status transition.
      */
     public static BaseException invalidStatusTransitionError(String current, String target) {
         String humanMessage = String.format("Invalid status transition from %s to %s", current, target);
