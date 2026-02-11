@@ -5,8 +5,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
 /**
- * Base class for tests that require a real database.
- * Uses Zonky embedded PostgreSQL; schema is applied via Liquibase.
+ * Base class for tests that require a database.
  */
 @SpringBootTest
 @ActiveProfiles("test")
