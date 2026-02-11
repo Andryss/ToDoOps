@@ -21,7 +21,7 @@ jobs:
           cache: maven
 
       - name: Build
-        run: mvn -B dependency:go-offline clean package -DskipTests
+        run: mvn clean package -DskipTests
         working-directory: backend
 
   test:
@@ -40,6 +40,6 @@ jobs:
           cache: maven
 
       - name: Run tests
-        run: mvn -B test
+        run: mvn test
         working-directory: backend
 
