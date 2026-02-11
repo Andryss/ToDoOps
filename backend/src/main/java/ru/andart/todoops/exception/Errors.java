@@ -24,7 +24,7 @@ public final class Errors {
     }
 
     /**
-     * Validation error (general).
+     * Validation error.
      */
     public static BaseException validationError(String message) {
         return new BaseException(400, "validation.error", message != null ? message : "Validation error");
