@@ -1,6 +1,6 @@
 package ru.andart.todoops.controller;
 
-import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RestController;
 import ru.andart.todoops.converter.TaskConverter;
 import ru.andart.todoops.generated.api.TasksApi;
 import ru.andart.todoops.generated.model.TaskCreateRequest;
@@ -19,7 +19,7 @@ import lombok.extern.slf4j.Slf4j;
  * REST controller for task API. Logs each request.
  */
 @Slf4j
-@Controller
+@RestController
 public class TasksApiImpl implements TasksApi {
 
     private final TaskService taskService;

@@ -21,6 +21,8 @@
 		<java.version>17</java.version>
 
 		<swagger-annotations.version>2.2.23</swagger-annotations.version>
+		<zonky.embedded-database.version>2.6.0</zonky.embedded-database.version>
+		<zonky.embedded-postgres.version>2.1.0</zonky.embedded-postgres.version>
 
 		<checkstyle-plugin.version>3.6.0</checkstyle-plugin.version>
 		<openapi-generator-plugin.version>7.8.0</openapi-generator-plugin.version>
@@ -78,6 +80,20 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>io.zonky.test</groupId>
+			<artifactId>embedded-database-spring-test</artifactId>
+			<version>${zonky.embedded-database.version}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>io.zonky.test</groupId>
+			<artifactId>embedded-postgres</artifactId>
+			<version>${zonky.embedded-postgres.version}</version>
 			<scope>test</scope>
 		</dependency>
 
