@@ -1,6 +1,7 @@
 package ru.andart.todoops.exception;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 
 /**
@@ -8,6 +9,7 @@ import lombok.Getter;
  * Contains error code, text identifier, and human-readable message.
  */
 @Getter
+@Builder
 @AllArgsConstructor
 public class BaseException extends RuntimeException {
 

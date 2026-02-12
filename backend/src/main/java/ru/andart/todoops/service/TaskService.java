@@ -38,12 +38,13 @@ public class TaskService {
      */
     public TaskEntity create(TaskCreateRequest request) {
         return transactionTemplate.execute(status -> {
-            TaskEntity entity = new TaskEntity();
-            entity.setTitle(request.getTitle());
-            entity.setDescription(request.getDescription());
-            entity.setStatus(TaskStatus.NEW);
-            entity.setCreatedAt(OffsetDateTime.now());
-            entity.setDueDate(request.getDueDate());
+            TaskEntity entity = TaskEntity.builder()
+                    .title(request.getTitle())
+                    .description(request.getDescription())
+                    .status(TaskStatus.NEW)
+                    .createdAt(OffsetDateTime.now())
+                    .dueDate(request.getDueDate())
+                    .build();
             return taskRepository.save(entity);
         });
     }

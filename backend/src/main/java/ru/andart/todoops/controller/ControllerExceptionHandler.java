@@ -5,6 +5,7 @@ import jakarta.validation.ConstraintViolationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ru.andart.todoops.exception.BaseException;
 import ru.andart.todoops.exception.Errors;
@@ -35,7 +36,7 @@ public class ControllerExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(BAD_REQUEST)
     public ErrorObject handleMethodArgumentNotValid(MethodArgumentNotValidException ex) {
-        var fieldError = ex.getBindingResult().getFieldError();
+        FieldError fieldError = ex.getBindingResult().getFieldError();
         String message = fieldError != null ? fieldError.getDefaultMessage() : "Validation error";
         return createErrorObject(Errors.validationError(message));
     }
@@ -54,7 +55,7 @@ public class ControllerExceptionHandler {
      */
     @ExceptionHandler(Exception.class)
     @ResponseStatus(INTERNAL_SERVER_ERROR)
-    public ErrorObject handleException(Exception ex) {
+    public ErrorObject handleException(Exception ignored) {
         return createErrorObject(Errors.unhandledExceptionError());
     }
 

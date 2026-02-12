@@ -12,7 +12,11 @@ public final class Errors {
      * Task not found by id.
      */
     public static BaseException taskNotFoundError(Long id) {
-        return new BaseException(400, "task.not_found", "Task not found: " + id);
+        return BaseException.builder()
+                .code(400)
+                .message("task.not_found")
+                .humanMessage("Task not found: " + id)
+                .build();
     }
 
     /**
@@ -20,20 +24,32 @@ public final class Errors {
      */
     public static BaseException invalidStatusTransitionError(String current, String target) {
         String humanMessage = String.format("Invalid status transition from %s to %s", current, target);
-        return new BaseException(400, "task.invalid_status_transition", humanMessage);
+        return BaseException.builder()
+                .code(400)
+                .message("task.invalid_status_transition")
+                .humanMessage(humanMessage)
+                .build();
     }
 
     /**
      * Validation error.
      */
     public static BaseException validationError(String message) {
-        return new BaseException(400, "validation.error", message != null ? message : "Validation error");
+        return BaseException.builder()
+                .code(400)
+                .message("validation.error")
+                .humanMessage(message != null ? message : "Validation error")
+                .build();
     }
 
     /**
      * Unexpected unhandled error.
      */
     public static BaseException unhandledExceptionError() {
-        return new BaseException(500, "internal.error", "Something went wrong...");
+        return BaseException.builder()
+                .code(500)
+                .message("internal.error")
+                .humanMessage("Something went wrong...")
+                .build();
     }
 }

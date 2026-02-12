@@ -1,7 +1,9 @@
 package ru.andart.todoops.controller;
 
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.RestController;
 import ru.andart.todoops.converter.TaskConverter;
+import ru.andart.todoops.entity.TaskEntity;
 import ru.andart.todoops.generated.api.TasksApi;
 import ru.andart.todoops.generated.model.TaskCreateRequest;
 import ru.andart.todoops.generated.model.TaskPageResponse;
@@ -39,11 +41,16 @@ public class TasksApiImpl implements TasksApi {
     @Override
     public TaskPageResponse listTasks(Integer page, Integer size) {
         log.info("GET /api/v1/tasks listTasks page={} size={}", page, size);
-        var slice = taskService.list(page, size);
+        Page<TaskEntity> slice = taskService.list(page, size);
         List<TaskResponse> content = slice.getContent().stream()
                 .map(taskConverter::toResponse)
                 .collect(Collectors.toList());
-        return new TaskPageResponse(content, slice.getTotalElements(), slice.getTotalPages(), size, page);
+        return new TaskPageResponse()
+                .content(content)
+                .totalElements(slice.getTotalElements())
+                .totalPages(slice.getTotalPages())
+                .size(size)
+                .number(page);
     }
 
     @Override

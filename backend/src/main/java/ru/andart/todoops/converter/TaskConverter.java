@@ -18,13 +18,12 @@ public class TaskConverter {
      */
     public TaskResponse toResponse(TaskEntity entity) {
         String description = entity.getDescription() != null ? entity.getDescription() : "";
-        return new TaskResponse(
-                entity.getId(),
-                entity.getTitle(),
-                description,
-                entity.getStatus(),
-                entity.getCreatedAt(),
-                entity.getDueDate()
-        );
+        return new TaskResponse()
+                .id(entity.getId())
+                .title(entity.getTitle())
+                .description(description)
+                .status(entity.getStatus())
+                .createdAt(entity.getCreatedAt())
+                .dueDate(entity.getDueDate());
     }
 }

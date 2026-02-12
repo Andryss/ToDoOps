@@ -12,6 +12,8 @@ import ru.andart.todoops.generated.model.TaskStatus;
 
 import java.time.OffsetDateTime;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,7 +23,9 @@ import lombok.Setter;
 @Table(name = "task")
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
 @EqualsAndHashCode
 public class TaskEntity {
 
