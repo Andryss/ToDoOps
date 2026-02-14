@@ -1,26 +1,15 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import {
-  listTasks,
-  createTask,
-  updateTask,
-  deleteTask,
-  changeTaskStatus,
-} from './api/tasksApi';
-import type {
-  Task,
-  TaskPage,
-  TaskCreateRequest,
-  TaskUpdateRequest,
-  TaskStatus,
-} from './types/task';
-import { TaskForm } from './components/TaskForm';
-import { TaskList } from './components/TaskList';
-import { Modal } from './components/Modal';
+import React, {useCallback, useEffect, useState} from 'react';
+import {createTask, listTasks,} from './api/tasksApi';
+import type {TaskCreateRequest, TaskPage,} from './types/task';
+import {TaskForm} from './components/TaskForm';
+import {TaskList} from './components/TaskList';
+import {TaskDetailModal} from './components/TaskDetailModal';
+import {Modal} from './components/Modal';
 import './App.css';
 
 const PAGE_SIZE = 20;
 
-type ModalMode = 'create' | { type: 'edit'; task: Task } | null;
+type ModalMode = 'create' | { type: 'detail'; taskId: number } | null;
 
 function App() {
   const [pageData, setPageData] = useState<TaskPage | null>(null);
@@ -52,7 +41,7 @@ function App() {
   }, [loadTasks, page]);
 
   const openCreateModal = () => setModalMode('create');
-  const openEditModal = (task: Task) => setModalMode({ type: 'edit', task });
+  const openTaskDetail = (taskId: number) => setModalMode({ type: 'detail', taskId });
   const closeModal = () => setModalMode(null);
 
   const handleCreate = async (data: TaskCreateRequest) => {
@@ -61,41 +50,17 @@ function App() {
     await loadTasks(0);
   };
 
-  const handleUpdate = async (data: TaskUpdateRequest) => {
-    if (modalMode === null || modalMode === 'create') return;
-    await updateTask(modalMode.task.id, data);
-    closeModal();
-    await refreshList();
-  };
-
-  const handleStatusChange = async (id: number, status: TaskStatus) => {
-    await changeTaskStatus(id, { status });
-    if (modalMode !== null && modalMode !== 'create' && modalMode.task.id === id) {
-      setModalMode({ type: 'edit', task: { ...modalMode.task, status } });
-    }
-    await refreshList();
-  };
-
-  const handleDelete = async (id: number) => {
-    if (!window.confirm('Delete this task?')) return;
-    await deleteTask(id);
-    if (modalMode !== null && modalMode !== 'create' && modalMode.task.id === id) {
-      closeModal();
-    }
-    await refreshList();
-  };
-
   const tasks = pageData?.content ?? [];
   const totalPages = pageData?.totalPages ?? 0;
   const totalElements = pageData?.totalElements ?? 0;
 
   const isCreate = modalMode === 'create';
-  const isEdit = modalMode !== null && modalMode !== 'create';
+  const isDetail = modalMode !== null && modalMode !== 'create';
 
   return (
     <div className="App">
       <header className="App-header">
-        <h1>ToDo</h1>
+        <h1>ToDoOps</h1>
       </header>
       <main className="App-main">
         {error && (
@@ -122,9 +87,7 @@ function App() {
             totalElements={totalElements}
             pageSize={PAGE_SIZE}
             onPageChange={(p) => loadTasks(p)}
-            onStatusChange={handleStatusChange}
-            onEdit={openEditModal}
-            onDelete={handleDelete}
+            onTaskClick={openTaskDetail}
             loading={loading}
           />
         </section>
@@ -141,15 +104,13 @@ function App() {
         </Modal>
       )}
 
-      {isEdit && (
-        <Modal title="Edit task" onClose={closeModal}>
-          <TaskForm
-            initial={modalMode.task}
-            onSubmit={handleUpdate}
-            onCancel={closeModal}
-            submitLabel="Update"
-          />
-        </Modal>
+      {isDetail && (
+        <TaskDetailModal
+          taskId={modalMode.taskId}
+          onClose={closeModal}
+          onSaved={refreshList}
+          onDeleted={refreshList}
+        />
       )}
     </div>
   );

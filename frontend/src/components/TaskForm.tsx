@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import type { Task, TaskCreateRequest, TaskUpdateRequest } from '../types/task';
+import { validateTaskForm, TITLE_MAX_LENGTH, DESCRIPTION_MAX_LENGTH } from '../utils/taskValidation';
 
 interface TaskFormProps {
   initial?: Task | null;
@@ -41,6 +42,11 @@ export function TaskForm({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    const validationError = validateTaskForm(title, description);
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
     setLoading(true);
     try {
       const payload: TaskCreateRequest | TaskUpdateRequest = {
@@ -60,33 +66,39 @@ export function TaskForm({
     <form onSubmit={handleSubmit} className="task-form">
       {error && <div className="form-error" role="alert">{error}</div>}
       <div className="form-row">
-        <label htmlFor="task-title">Title</label>
+        <label htmlFor="task-title">
+          Title <span className="form-required">*</span>
+        </label>
         <input
           id="task-title"
           type="text"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           required
-          maxLength={200}
+          maxLength={TITLE_MAX_LENGTH}
           placeholder="Task title"
           disabled={loading}
         />
+        <span className="form-field-count">{title.length}/{TITLE_MAX_LENGTH}</span>
       </div>
       <div className="form-row">
-        <label htmlFor="task-description">Description</label>
+        <label htmlFor="task-description">
+          Description <span className="form-required">*</span>
+        </label>
         <textarea
           id="task-description"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           required
-          maxLength={4000}
+          maxLength={DESCRIPTION_MAX_LENGTH}
           placeholder="Description"
           rows={3}
           disabled={loading}
         />
+        <span className="form-field-count">{description.length}/{DESCRIPTION_MAX_LENGTH}</span>
       </div>
       <div className="form-row">
-        <label htmlFor="task-due">Due date (optional)</label>
+        <label htmlFor="task-due">Due date</label>
         <input
           id="task-due"
           type="datetime-local"

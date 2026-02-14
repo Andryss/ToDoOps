@@ -1,5 +1,6 @@
 import React from 'react';
-import type { Task, TaskStatus } from '../types/task';
+import type { Task } from '../types/task';
+import { formatDateTime } from '../utils/dateFormat';
 
 interface TaskListProps {
   tasks: Task[];
@@ -8,39 +9,8 @@ interface TaskListProps {
   totalElements: number;
   pageSize: number;
   onPageChange: (page: number) => void;
-  onStatusChange: (id: number, status: TaskStatus) => void;
-  onEdit: (task: Task) => void;
-  onDelete: (id: number) => void;
+  onTaskClick: (taskId: number) => void;
   loading?: boolean;
-}
-
-const STATUS_LABELS: Record<TaskStatus, string> = {
-  NEW: 'New',
-  IN_PROGRESS: 'In progress',
-  COMPLETED: 'Completed',
-};
-
-/** Allowed next steps: NEW → IN_PROGRESS → COMPLETED (no going back). */
-function getStatusOptions(current: TaskStatus): TaskStatus[] {
-  switch (current) {
-    case 'NEW':
-      return ['NEW', 'IN_PROGRESS'];
-    case 'IN_PROGRESS':
-      return ['IN_PROGRESS', 'COMPLETED'];
-    case 'COMPLETED':
-      return ['COMPLETED'];
-    default:
-      return [current];
-  }
-}
-
-function formatDate(iso: string | null): string {
-  if (!iso) return '—';
-  try {
-    return new Date(iso).toLocaleString();
-  } catch {
-    return iso;
-  }
 }
 
 export function TaskList({
@@ -50,9 +20,7 @@ export function TaskList({
   totalElements,
   pageSize,
   onPageChange,
-  onStatusChange,
-  onEdit,
-  onDelete,
+  onTaskClick,
   loading,
 }: TaskListProps) {
   const from = totalElements === 0 ? 0 : page * pageSize + 1;
@@ -66,64 +34,22 @@ export function TaskList({
       )}
       {!loading && tasks.length > 0 && (
         <>
-          <table className="tasks-table">
-            <thead>
-              <tr>
-                <th>Title</th>
-                <th>Description</th>
-                <th>Status</th>
-                <th>Due date</th>
-                <th>Created</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {tasks.map((task) => (
-                <tr key={task.id}>
-                  <td>{task.title}</td>
-                  <td className="cell-description">
-                    {task.description || '—'}
-                  </td>
-                  <td>
-                    <select
-                      value={task.status}
-                      onChange={(e) =>
-                        onStatusChange(
-                          task.id,
-                          e.target.value as TaskStatus
-                        )
-                      }
-                      aria-label={`Status for ${task.title}`}
-                    >
-                      {getStatusOptions(task.status).map((s) => (
-                        <option key={s} value={s}>
-                          {STATUS_LABELS[s]}
-                        </option>
-                      ))}
-                    </select>
-                  </td>
-                  <td>{formatDate(task.due_date)}</td>
-                  <td>{formatDate(task.created_at)}</td>
-                  <td className="cell-actions">
-                    <button
-                      type="button"
-                      onClick={() => onEdit(task)}
-                      className="btn-edit"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => onDelete(task.id)}
-                      className="btn-delete"
-                    >
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <div className="task-rows">
+            {tasks.map((task) => (
+              <div
+                key={task.id}
+                className="task-row"
+                onClick={() => onTaskClick(task.id)}
+              >
+                <span className="task-row-title">{task.title}</span>
+                {task.due_date && (
+                  <span className="task-row-due">
+                    {formatDateTime(task.due_date)}
+                  </span>
+                )}
+              </div>
+            ))}
+          </div>
           {totalPages > 1 && (
             <div className="pagination">
               <span className="pagination-info">

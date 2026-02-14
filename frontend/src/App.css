@@ -150,6 +150,13 @@
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+}
+
+.task-form .form-row input,
+.task-form .form-row textarea,
+.task-form .form-row select {
+  font-family: inherit;
 }
 
 .form-error {
@@ -164,14 +171,30 @@
   color: #444;
 }
 
+.form-required {
+  color: #c00;
+}
+
+.form-field-count {
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 0.85rem;
+  color: #666;
+}
+
 .form-row input,
-.form-row textarea {
+.form-row textarea,
+.form-row select {
   width: 100%;
   padding: 0.5rem 0.6rem;
   border: 1px solid #ccc;
   border-radius: 4px;
   font-size: 1rem;
   box-sizing: border-box;
+}
+
+.form-row select {
+  cursor: pointer;
 }
 
 .form-row textarea {
@@ -205,6 +228,80 @@
   cursor: not-allowed;
 }
 
+.form-actions-with-delete {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.form-actions-left {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.form-actions-with-delete .btn-delete {
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  border: 1px solid #d88;
+  background: #fff5f5;
+  color: #c00;
+  cursor: pointer;
+  font-size: 0.95rem;
+}
+
+.form-actions-with-delete .btn-delete:hover:not(:disabled) {
+  background: #ffe5e5;
+}
+
+.modal-loading,
+.modal-error {
+  padding: 1rem;
+  text-align: center;
+}
+
+.modal-error {
+  color: #c00;
+  background: #fee;
+  border-radius: 6px;
+}
+
+.discard-confirm {
+  padding: 0.25rem 0;
+}
+
+.discard-confirm p {
+  margin: 0 0 1rem;
+  color: #333;
+}
+
+.discard-confirm-actions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+
+.discard-confirm .btn-keep-editing,
+.discard-confirm .btn-discard {
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.discard-confirm .btn-keep-editing {
+  border: 1px solid #ccc;
+  background: #f5f5f5;
+}
+
+.discard-confirm .btn-discard {
+  border: 1px solid #c00;
+  background: #fff5f5;
+  color: #c00;
+}
+
 /* TaskList */
 .task-list {
   position: relative;
@@ -217,59 +314,39 @@
   color: #666;
 }
 
-.tasks-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.9rem;
+.task-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
 }
 
-.tasks-table th,
-.tasks-table td {
-  padding: 0.5rem 0.6rem;
-  text-align: left;
+.task-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.6rem 0.5rem;
   border-bottom: 1px solid #eee;
+  cursor: pointer;
+  font-size: 0.95rem;
 }
 
-.tasks-table th {
-  font-weight: 600;
-  color: #444;
-  background: #fafafa;
+.task-row:hover {
+  background: #f5f5f5;
 }
 
-.cell-description {
-  max-width: 200px;
+.task-row-title {
+  flex: 1;
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.cell-actions {
-  white-space: nowrap;
-}
-
-.cell-actions .btn-edit,
-.cell-actions .btn-delete {
-  padding: 0.25rem 0.5rem;
-  margin-right: 0.25rem;
-  font-size: 0.85rem;
-  border-radius: 4px;
-  border: 1px solid #ccc;
-  background: #f5f5f5;
-  cursor: pointer;
-}
-
-.cell-actions .btn-delete {
-  color: #c00;
-  border-color: #fcc;
-  background: #fff5f5;
-}
-
-.tasks-table select {
-  padding: 0.25rem 0.4rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+.task-row-due {
+  flex-shrink: 0;
+  color: #666;
   font-size: 0.9rem;
-  cursor: pointer;
 }
 
 .pagination {
