@@ -10,6 +10,8 @@ RUN mvn package -DskipTests -Dcheckstyle.skip=true -B
 FROM openjdk:17.0.1-jdk-slim
 WORKDIR /opt/app
 
+RUN mkdir -p /opt/app/logs
+
 COPY --from=build /app/target/backend-*.jar backend.jar
 
 ENTRYPOINT ["java", "-jar", "backend.jar"]
