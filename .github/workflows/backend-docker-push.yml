@@ -26,3 +26,5 @@ jobs:
           context: ./backend
           push: true
           tags: ${{ secrets.DOCKER_HUB_USERNAME }}/todoops-backend:${{ steps.meta.outputs.tag }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
