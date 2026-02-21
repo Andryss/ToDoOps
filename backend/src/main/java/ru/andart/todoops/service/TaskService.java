@@ -31,7 +31,7 @@ public class TaskService {
     private final TransactionTemplate readOnlyTransactionTemplate;
 
     /**
-     * Creates a new task in NEW status.
+     * Creates a new task in NEW status
      *
      * @param request create request (title and description required; status is not accepted, always NEW)
      * @return created task entity
@@ -66,7 +66,7 @@ public class TaskService {
      *
      * @param id task id
      * @return task entity
-     * @throws BaseException if task not found (via Errors.taskNotFoundError)
+     * @throws BaseException if task not found
      */
     public TaskEntity getById(Long id) {
         return readOnlyTransactionTemplate.execute(status ->
