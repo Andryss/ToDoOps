@@ -2,15 +2,9 @@ name: Backend Docker Push
 
 on:
   workflow_dispatch:
-    inputs:
-      build_and_push:
-        description: 'Build and push backend image to Docker Hub?'
-        required: true
-        type: boolean
 
 jobs:
   push:
-    if: github.event.inputs.build_and_push == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
