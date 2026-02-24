@@ -25,8 +25,9 @@ resource "yandex_compute_instance" "backend" {
   }
 
   network_interface {
-    subnet_id = yandex_vpc_subnet.todoops.id
-    nat       = true
+    subnet_id          = yandex_vpc_subnet.todoops.id
+    nat                = true
+    security_group_ids = [yandex_vpc_security_group.ssh_inbound.id, yandex_vpc_security_group.all_outbound.id]
   }
 
   metadata = var.ssh_public_key_path != "" ? {
@@ -55,8 +56,9 @@ resource "yandex_compute_instance" "frontend" {
   }
 
   network_interface {
-    subnet_id = yandex_vpc_subnet.todoops.id
-    nat       = true
+    subnet_id          = yandex_vpc_subnet.todoops.id
+    nat                = true
+    security_group_ids = [yandex_vpc_security_group.ssh_inbound.id, yandex_vpc_security_group.all_outbound.id]
   }
 
   metadata = var.ssh_public_key_path != "" ? {
