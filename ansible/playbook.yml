@@ -1,0 +1,24 @@
+---
+# Install Docker on backend and frontend VMs. Run: ansible-playbook playbook.yml -e @vars.yml
+
+- name: Install Docker on ToDoOps VMs
+  hosts: all
+  become: true
+  tasks:
+    - name: Install Docker from Ubuntu repository
+      ansible.builtin.apt:
+        name: docker.io
+        state: present
+        update_cache: true
+
+    - name: Start and enable Docker service
+      ansible.builtin.service:
+        name: docker
+        state: started
+        enabled: true
+
+    - name: Add {{ ansible_user }} to docker group
+      ansible.builtin.user:
+        name: "{{ ansible_user }}"
+        groups: docker
+        append: true
