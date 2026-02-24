@@ -1,0 +1,12 @@
+# Hosts use backend_ip, frontend_ip from vars.yml
+
+all:
+  children:
+    backend:
+      hosts:
+        backend_vm:
+          ansible_host: "{{ backend_ip | default('REPLACE_WITH_BACKEND_IP') }}"
+    frontend:
+      hosts:
+        frontend_vm:
+          ansible_host: "{{ frontend_ip | default('REPLACE_WITH_FRONTEND_IP') }}"

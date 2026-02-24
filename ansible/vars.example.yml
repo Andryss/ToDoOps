@@ -1,0 +1,13 @@
+# Copy to vars.yml and set your values. Do not commit vars.yml.
+
+# Backend VM public IP
+backend_ip: "10.0.0.1"
+
+# Frontend VM public IP
+frontend_ip: "10.0.0.2"
+
+# SSH user on the VMs
+ansible_user: ubuntu
+
+# Path to SSH private key
+ansible_ssh_private_key_file: "~/.ssh/id_rsa"
