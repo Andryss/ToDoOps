@@ -1,4 +1,7 @@
-# --- Backend Deployment: Spring Boot app. Replace image with your Docker Hub image.
+# Example backend manifest. Copy to backend.yaml and replace YOUR_DOCKERHUB_USER with your image registry path.
+#   cp backend.example.yaml backend.yaml
+#   # Edit backend.yaml: set image to e.g. youruser/todoops-backend:latest
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -18,7 +21,7 @@ spec:
     spec:
       containers:
         - name: backend
-          image: andryss/todoops-backend:20260227-163540
+          image: YOUR_DOCKERHUB_USER/todoops-backend:latest
           ports:
             - containerPort: 8080
           env:
@@ -57,7 +60,6 @@ spec:
             initialDelaySeconds: 30
             periodSeconds: 5
 ---
-# --- Backend Service: internal DNS name "backend" for frontend and Ingress.
 apiVersion: v1
 kind: Service
 metadata:
