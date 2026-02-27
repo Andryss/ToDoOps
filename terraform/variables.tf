@@ -28,3 +28,22 @@ variable "ssh_public_key_path" {
   type        = string
   default     = "~/.ssh/id_rsa.pub"
 }
+
+variable "pg_database" {
+  description = "PostgreSQL database name (Yandex Managed PG)"
+  type        = string
+  default     = "todoops"
+}
+
+variable "pg_username" {
+  description = "PostgreSQL user name (Yandex Managed PG)"
+  type        = string
+  default     = "todoops"
+}
+
+variable "pg_password" {
+  description = "Password for the PostgreSQL user (Managed PG cluster)"
+  type        = string
+  sensitive   = true
+}
+
