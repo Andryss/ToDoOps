@@ -2,22 +2,26 @@ package ru.andart.todoops.controller;
 
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.ConstraintViolationException;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 import ru.andart.todoops.exception.BaseException;
 import ru.andart.todoops.exception.Errors;
 import ru.andart.todoops.generated.model.ErrorObject;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 /**
  * Global exception handler for REST API.
  * Converts exceptions to standardized ErrorObject responses.
  */
+@Slf4j
 @RestControllerAdvice
 public class ControllerExceptionHandler {
 
@@ -26,6 +30,7 @@ public class ControllerExceptionHandler {
      */
     @ExceptionHandler(BaseException.class)
     public ErrorObject handleBaseException(BaseException ex, HttpServletResponse response) {
+        log.warn("BaseException: code={}, message={}", ex.getCode(), ex.getMessage());
         response.setStatus(ex.getCode());
         return createErrorObject(ex);
     }
@@ -38,6 +43,7 @@ public class ControllerExceptionHandler {
     public ErrorObject handleMethodArgumentNotValid(MethodArgumentNotValidException ex) {
         FieldError fieldError = ex.getBindingResult().getFieldError();
         String message = fieldError != null ? fieldError.getDefaultMessage() : "Validation error";
+        log.warn("Validation error: {}", message);
         return createErrorObject(Errors.validationError(message));
     }
 
@@ -47,7 +53,18 @@ public class ControllerExceptionHandler {
     @ExceptionHandler(ConstraintViolationException.class)
     @ResponseStatus(BAD_REQUEST)
     public ErrorObject handleConstraintViolation(ConstraintViolationException ex) {
+        log.warn("Constraint violation: {}", ex.getMessage());
         return createErrorObject(Errors.validationError(ex.getMessage()));
+    }
+
+    /**
+     * Handles NoResourceFoundException (e.g. static resource or path not found).
+     */
+    @ExceptionHandler(NoResourceFoundException.class)
+    @ResponseStatus(NOT_FOUND)
+    public ErrorObject handleNoResourceFound(NoResourceFoundException ex) {
+        log.warn("Resource not found: {}", ex.getResourcePath());
+        return createErrorObject(Errors.notFound());
     }
 
     /**
@@ -55,7 +72,8 @@ public class ControllerExceptionHandler {
      */
     @ExceptionHandler(Exception.class)
     @ResponseStatus(INTERNAL_SERVER_ERROR)
-    public ErrorObject handleException(Exception ignored) {
+    public ErrorObject handleException(Exception ex) {
+        log.error("Unhandled exception: {}", ex.getMessage(), ex);
         return createErrorObject(Errors.unhandledExceptionError());
     }
 
