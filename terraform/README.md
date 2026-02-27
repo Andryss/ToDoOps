@@ -1,6 +1,6 @@
-# Terraform – ToDoOps VMs in Yandex Cloud
+# Terraform – ToDoOps in Yandex Cloud
 
-Creates backend and frontend VMs, network, and security groups in Yandex Cloud.
+Creates backend and frontend VMs, network, security groups, and optionally a **Kubernetes cluster** (Yandex Managed Service for Kubernetes) in Yandex Cloud.
 
 ## Prerequisites
 
@@ -35,10 +35,11 @@ terraform apply
 
 ## What Terraform creates
 
-- **Network** – VPC and subnet (10.0.1.0/24).
-- **Security groups** – ssh_inbound (SSH), all_outbound (egress).
+- **Network** – VPC, subnet for VMs (10.0.1.0/24), subnet for Kubernetes (10.0.2.0/24).
+- **Security groups** – ssh_inbound (SSH), all_outbound (egress), k8s (API 443, node-to-node, egress).
 - **Backend VM** – Ubuntu, 2 cores, 2 GB RAM, public IP.
 - **Frontend VM** – Ubuntu, 2 cores, 2 GB RAM, public IP.
+- **Kubernetes** – Managed cluster + node group (service account, IAM roles, zonal master, public API).
 
 ## Outputs
 
@@ -47,4 +48,12 @@ After apply, use outputs for Ansible or SSH:
 ```bash
 terraform output backend_public_ip
 terraform output frontend_public_ip
+```
+
+For Kubernetes, get kubeconfig with Yandex CLI (install `yc` and run `yc init`):
+
+```bash
+terraform output -raw k8s_cluster_id   # use this as <cluster_id>
+yc managed-kubernetes cluster get-credentials <cluster_id> --external
+kubectl get nodes
 ```
