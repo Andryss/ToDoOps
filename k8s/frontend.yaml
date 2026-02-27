@@ -1,0 +1,41 @@
+# --- Frontend Deployment: Nginx serving static app; proxy /api/ to backend.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  namespace: todoops
+  labels:
+    app: frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+        - name: frontend
+          image: andryss/todoops-frontend:20260221-132905
+          ports:
+            - containerPort: 80
+          env:
+            - name: BACKEND_URL
+              value: "http://backend:8080/api/"
+            - name: API_LOCATION
+              value: "/api/"
+---
+# --- Frontend Service: internal DNS name "frontend"; optional type: LoadBalancer for external access.
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend
+  namespace: todoops
+spec:
+  selector:
+    app: frontend
+  ports:
+    - port: 80
+      targetPort: 80
