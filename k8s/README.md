@@ -19,14 +19,15 @@ Create the secret first, then apply the backend so the pods get these env vars a
 
 ## Configuration
 
-Copy the example secret and set your values:
+Copy the example files and set your values:
 
 ```bash
 cp secret.example.yaml secret.yaml
 # Edit secret.yaml: SPRING_DATASOURCE_URL, SPRING_DATASOURCE_USERNAME, SPRING_DATASOURCE_PASSWORD
+cp backend.example.yaml backend.yaml
+cp frontend.example.yaml frontend.yaml
+# Edit backend.yaml and frontend.yaml: replace YOUR_DOCKERHUB_USER with your image registry path (e.g. youruser/todoops-backend:latest)
 ```
-
-Docker images are assumed to be under the `andryss` Docker Hub user (`andryss/todoops-backend:latest`, `andryss/todoops-frontend:latest`). Edit `backend.yaml` and `frontend.yaml` if you use a different registry or user.
 
 ## Run
 
