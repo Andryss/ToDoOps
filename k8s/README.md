@@ -37,6 +37,7 @@ From this directory:
 kubectl apply -f namespace.yaml
 kubectl apply -f secret.yaml
 kubectl apply -f backend.yaml
+kubectl apply -f hpa-backend.yaml
 kubectl apply -f frontend.yaml
 ```
 
@@ -51,6 +52,7 @@ kubectl apply -f .
 - **namespace** – `todoops`
 - **secret** – `todoops-secrets` (DB URL, user, password)
 - **backend** – Deployment (2 replicas) + Service on port 8080
+- **backend-hpa** – HorizontalPodAutoscaler: scales backend on CPU > 15% (min 1, max 10 replicas); apply `hpa-backend.yaml`
 - **frontend** – Deployment + Service on port 80 (env: BACKEND_URL, API_LOCATION inlined)
 - **ingress.yaml** – Commented example; uncomment and set host/ingressClassName when using an Ingress controller
 
