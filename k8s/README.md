@@ -53,3 +53,21 @@ kubectl apply -f .
 - **backend** – Deployment (2 replicas) + Service on port 8080
 - **frontend** – Deployment + Service on port 80 (env: BACKEND_URL, API_LOCATION inlined)
 - **ingress.yaml** – Commented example; uncomment and set host/ingressClassName when using an Ingress controller
+
+## Port forwarding (local access)
+
+To access the frontend (and optionally the backend) from your machine without LoadBalancer or Ingress, use `kubectl port-forward`:
+
+**Frontend** (browser at http://localhost:8080):
+
+```bash
+kubectl port-forward -n todoops svc/frontend 8080:80
+```
+
+**Backend API** (e.g. for debugging, on port 8081):
+
+```bash
+kubectl port-forward -n todoops svc/backend 8081:8080
+```
+
+Run each command in a separate terminal; they block while the tunnel is active. Stop with Ctrl+C.
