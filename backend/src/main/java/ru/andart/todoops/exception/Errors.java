@@ -43,6 +43,17 @@ public final class Errors {
     }
 
     /**
+     * Resource or path not found (404).
+     */
+    public static BaseException notFound() {
+        return BaseException.builder()
+                .code(404)
+                .message("resource.not.found")
+                .humanMessage("Resource not found")
+                .build();
+    }
+
+    /**
      * Unexpected unhandled error.
      */
     public static BaseException unhandledExceptionError() {
