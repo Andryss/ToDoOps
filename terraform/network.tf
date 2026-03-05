@@ -22,15 +22,6 @@ resource "yandex_vpc_subnet" "k8s" {
   zone           = var.default_zone
 }
 
-# Subnet for Managed PostgreSQL
-resource "yandex_vpc_subnet" "pg" {
-  name           = "todoops-pg-subnet"
-  description    = "Subnet for PostgreSQL cluster"
-  network_id     = yandex_vpc_network.todoops.id
-  v4_cidr_blocks = ["10.0.3.0/24"]
-  zone           = var.default_zone
-}
-
 # Security group: inbound SSH only
 resource "yandex_vpc_security_group" "ssh_inbound" {
   name        = "ssh_inbound"
@@ -58,43 +49,45 @@ resource "yandex_vpc_security_group" "all_outbound" {
   }
 }
 
-# Security group for Kubernetes: API server (443), node-to-node, egress
+# Security group for Kubernetes: API, Ingress (80, 443, 10254), NodePort range, node-to-node, egress
 resource "yandex_vpc_security_group" "k8s" {
   name        = "todoops-k8s-sg"
   description = "Security group for Kubernetes cluster and nodes"
   network_id  = yandex_vpc_network.todoops.id
 
   ingress {
-    description    = "Kubernetes API (HTTPS)"
+    description    = "HTTP traffic"
+    protocol       = "TCP"
+    v4_cidr_blocks = ["0.0.0.0/0"]
+    port           = 80
+  }
+
+  ingress {
+    description    = "HTTPS traffic"
     protocol       = "TCP"
     v4_cidr_blocks = ["0.0.0.0/0"]
     port           = 443
   }
 
   ingress {
+    description    = "NGINX Ingress controller health checks"
+    protocol       = "TCP"
+    v4_cidr_blocks = ["0.0.0.0/0"]
+    port           = 10256
+  }
+
+  ingress {
+    description    = "NodePort traffic"
+    protocol       = "TCP"
+    v4_cidr_blocks = ["0.0.0.0/0"]
+    from_port      = 30000
+    to_port        = 32767
+  }
+
+  ingress {
     description    = "Node-to-node (internal)"
     protocol       = "ANY"
     v4_cidr_blocks = ["10.0.0.0/8"]
-  }
-
-  egress {
-    description    = "Allow all outbound"
-    protocol       = "ANY"
-    v4_cidr_blocks = ["0.0.0.0/0"]
-  }
-}
-
-# Security group for Managed PostgreSQL: allow 6432 from VPC (k8s, VMs)
-resource "yandex_vpc_security_group" "pg" {
-  name        = "todoops-pg-sg"
-  description = "Allow PostgreSQL from ToDoOps VPC"
-  network_id  = yandex_vpc_network.todoops.id
-
-  ingress {
-    description    = "PostgreSQL (Yandex Managed PG port)"
-    protocol       = "TCP"
-    v4_cidr_blocks = ["10.0.0.0/8"]
-    port           = 6432
   }
 
   egress {

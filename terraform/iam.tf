@@ -19,3 +19,17 @@ resource "yandex_resourcemanager_folder_iam_member" "k8s_vpc_public_admin" {
   role      = "vpc.publicAdmin"
   member    = "serviceAccount:${yandex_iam_service_account.k8s.id}"
 }
+
+# Required for LoadBalancer-type Services (e.g. ingress-nginx controller) to get an external IP.
+resource "yandex_resourcemanager_folder_iam_member" "k8s_load_balancer_admin" {
+  folder_id = var.folder_id
+  role      = "load-balancer.admin"
+  member    = "serviceAccount:${yandex_iam_service_account.k8s.id}"
+}
+
+# For pulling container images from the folder's registry (optional; omit if using only public registries).
+resource "yandex_resourcemanager_folder_iam_member" "k8s_registry_puller" {
+  folder_id = var.folder_id
+  role      = "container-registry.images.puller"
+  member    = "serviceAccount:${yandex_iam_service_account.k8s.id}"
+}

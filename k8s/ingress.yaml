@@ -1,0 +1,23 @@
+# Ingress: routes HTTP traffic to the frontend (which proxies /api/ to backend).
+# Requires the NGINX Ingress Controller to be installed (see k8s/README.md, section "Ingress controller (NGINX)").
+# Use the controller's EXTERNAL-IP in browser, or set rules[].host to your domain and point DNS.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: todoops
+  namespace: todoops
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: "0"
+spec:
+  ingressClassName: nginx
+  rules:
+    # No host = match any host (access via http://<EXTERNAL-IP>). Add host: "your-domain.com" when you have DNS.
+    - http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: frontend
+                port:
+                  number: 80
