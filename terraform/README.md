@@ -32,9 +32,6 @@ terraform apply
 - **service_account_key_file** – Path to service account key JSON (see `service-account-key.example.json`; [create a key in the console](https://yandex.cloud/ru/docs/iam/operations/authentication/manage-authorized-keys#create-authorized-key))
 - **default_zone** – Availability zone (default: ru-central1-a)
 - **ssh_public_key_path** – Path to SSH public key for VM access
-- **pg_database** – PostgreSQL database name (default: todoops)
-- **pg_username** – PostgreSQL app user name (default: todoops)
-- **pg_password** – Password for the PostgreSQL app user
 
 ## What Terraform creates
 
@@ -42,11 +39,10 @@ terraform apply
 - **Security groups** – ssh_inbound (TCP 22), http_inbound (TCP 80), all_outbound (egress), k8s (API 443, node-to-node, egress).
 - **Application VM** (`todoops-app-vm`) – Ubuntu, 2 cores, 4 GB RAM, public IP (hosts both frontend and backend).
 - **Kubernetes** – Managed cluster + node group (service account, IAM roles, zonal master, public API).
-- **PostgreSQL** – Yandex Managed PG cluster (one host, database `todoops`, user `todoops`, subnet 10.0.3.0/24, port 6432).
 
 ## Outputs
 
-After apply, use outputs for Ansible or SSH:
+After apply, use outputs for SSH or Ansible:
 
 ```bash
 terraform output todoops_app_vm_public_ip
@@ -61,10 +57,4 @@ yc managed-kubernetes cluster get-credentials <cluster_id> --external
 kubectl get nodes
 ```
 
-For the app use PostgreSQL outputs:
-
-```bash
-terraform output pg_jdbc_url
-terraform output pg_host_fqdn
-# User and database from tfvars (pg_username, pg_database); password from pg_password
-```
+Then deploy the app (including PostgreSQL) from the `k8s/` directory; see `k8s/README.md`.

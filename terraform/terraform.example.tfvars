@@ -14,8 +14,3 @@ default_zone = "ru-central1-a"
 
 # Path to SSH public key for VM access
 ssh_public_key_path = "~/.ssh/id_ed25519.pub"
-
-# PostgreSQL (Yandex Managed)
-# pg_database     = "todoops"
-# pg_username     = "todoops"
-pg_password = "your-secure-password"
