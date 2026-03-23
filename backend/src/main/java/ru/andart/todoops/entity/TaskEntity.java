@@ -45,4 +45,5 @@ public class TaskEntity {
 
     @Column(name = "due_date")
     private OffsetDateTime dueDate;
+
 }
