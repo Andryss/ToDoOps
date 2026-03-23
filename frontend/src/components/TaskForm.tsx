@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import type { Task, TaskCreateRequest, TaskUpdateRequest } from '../types/task';
 import { validateTaskForm, TITLE_MAX_LENGTH, DESCRIPTION_MAX_LENGTH } from '../utils/taskValidation';
+import { apiDueDateToDatetimeLocal, datetimeLocalToOffsetIso } from '../utils/dateUtils';
 
 interface TaskFormProps {
   initial?: Task | null;
@@ -17,11 +18,7 @@ export function TaskForm({
 }: TaskFormProps) {
   const [title, setTitle] = useState(initial?.title ?? '');
   const [description, setDescription] = useState(initial?.description ?? '');
-  const [dueDate, setDueDate] = useState(
-    initial?.due_date
-      ? initial.due_date.slice(0, 16)
-      : ''
-  );
+  const [dueDate, setDueDate] = useState(apiDueDateToDatetimeLocal(initial?.due_date));
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -29,9 +26,7 @@ export function TaskForm({
     if (initial) {
       setTitle(initial.title);
       setDescription(initial.description);
-      setDueDate(
-        initial.due_date ? initial.due_date.slice(0, 16) : ''
-      );
+      setDueDate(apiDueDateToDatetimeLocal(initial.due_date));
     } else {
       setTitle('');
       setDescription('');
@@ -52,7 +47,7 @@ export function TaskForm({
       const payload: TaskCreateRequest | TaskUpdateRequest = {
         title: title.trim(),
         description: description.trim(),
-        due_date: dueDate.trim() || null,
+        due_date: datetimeLocalToOffsetIso(dueDate),
       };
       await onSubmit(payload);
     } catch (err) {

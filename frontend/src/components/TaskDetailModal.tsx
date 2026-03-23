@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { getTask, updateTask, deleteTask, changeTaskStatus } from '../api/tasksApi';
 import type { Task, TaskStatus, TaskUpdateRequest } from '../types/task';
 import { validateTaskForm, TITLE_MAX_LENGTH, DESCRIPTION_MAX_LENGTH } from '../utils/taskValidation';
+import { apiDueDateToDatetimeLocal, datetimeLocalToOffsetIso } from '../utils/dateUtils';
 import { Modal } from './Modal';
 
 const STATUS_LABELS: Record<TaskStatus, string> = {
@@ -49,7 +50,7 @@ export function TaskDetailModal({
   const [showDiscardConfirm, setShowDiscardConfirm] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
-  const initialDueDate = task ? (task.due_date ? task.due_date.slice(0, 16) : '') : '';
+  const initialDueDate = task ? apiDueDateToDatetimeLocal(task.due_date) : '';
   const isDirty =
       !!task &&
       (title !== task.title ||
@@ -66,7 +67,7 @@ export function TaskDetailModal({
       setTitle(data.title);
       setDescription(data.description);
       setStatus(data.status);
-      setDueDate(data.due_date ? data.due_date.slice(0, 16) : '');
+      setDueDate(apiDueDateToDatetimeLocal(data.due_date));
     } catch (err) {
       setLoadError(err instanceof Error ? err.message : 'Failed to load task');
     } finally {
@@ -92,7 +93,7 @@ export function TaskDetailModal({
       const payload: TaskUpdateRequest = {
         title: title.trim(),
         description: description.trim(),
-        due_date: dueDate.trim() || null,
+        due_date: datetimeLocalToOffsetIso(dueDate),
       };
       await updateTask(task.id, payload);
       if (status !== task.status) {
