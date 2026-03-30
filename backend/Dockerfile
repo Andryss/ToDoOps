@@ -6,6 +6,6 @@ WORKDIR /opt/app
 
 RUN mkdir -p /opt/app/logs
 
-COPY backend-*.jar app.jar
+COPY target/backend-*.jar app.jar
 
 ENTRYPOINT ["java", "-jar", "app.jar"]
