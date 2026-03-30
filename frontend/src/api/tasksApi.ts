@@ -6,7 +6,6 @@ import type {
   TaskStatusRequest,
   ApiError,
 } from '../types/task';
-import { ensureApiDueDateIso } from '../utils/dateUtils';
 
 const API_BASE =
   process.env.REACT_APP_API_URL || '/api/v1';
@@ -49,11 +48,10 @@ export async function getTask(id: number): Promise<Task> {
 export async function createTask(
   body: TaskCreateRequest
 ): Promise<Task> {
-  const payload = { ...body, due_date: ensureApiDueDateIso(body.due_date) };
   const response = await fetch(`${API_BASE}/tasks`, {
     method: 'POST',
     headers: jsonHeaders(),
-    body: JSON.stringify(payload),
+    body: JSON.stringify(body),
   });
   return handleResponse<Task>(response);
 }
@@ -62,11 +60,10 @@ export async function updateTask(
   id: number,
   body: TaskUpdateRequest
 ): Promise<Task> {
-  const payload = { ...body, due_date: ensureApiDueDateIso(body.due_date) };
   const response = await fetch(`${API_BASE}/tasks/${id}`, {
     method: 'PUT',
     headers: jsonHeaders(),
-    body: JSON.stringify(payload),
+    body: JSON.stringify(body),
   });
   return handleResponse<Task>(response);
 }
