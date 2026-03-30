@@ -1,5 +1,5 @@
-# Runtime image only — JAR must be built separately (e.g. `mvn package`) and placed next to this file.
-# Local: `cp target/backend-*.jar .` in this directory, then `docker build -t todoops-backend .`
+# Runtime image only — JAR must be built separately (`mvn package`) under target/, or supplied there by CI.
+# Local: `mvn package` then `docker build -t todoops-backend .`
 
 FROM eclipse-temurin:17-jre-jammy
 WORKDIR /opt/app
