@@ -1,11 +1,12 @@
-# Ansible – Docker on ToDoOps VMs
+# Ansible – Docker on ToDoOps VM
 
-Installs Docker CE on the backend and frontend VMs.
+Installs Docker on the single application VM (`todoops-app-vm` from Terraform).
 
 ## Prerequisites
 
 - Ansible 2.9+.
-- SSH access to VMs (user and key set in vars.yml).
+- SSH access to the VM (user and key set in `vars.yml`).
+- VM public IP from Terraform: `terraform output -raw todoops_app_vm_public_ip` (from the `terraform/` directory).
 
 ## Configuration
 
@@ -13,7 +14,7 @@ Copy the example variables and set your values:
 
 ```bash
 cp vars.example.yml vars.yml
-# Edit vars.yml: backend_ip, frontend_ip, ansible_user, ansible_ssh_private_key_file
+# Edit vars.yml: todoops_app_vm_ip, ansible_user, ansible_ssh_private_key_file
 ```
 
 ## Run
@@ -25,19 +26,12 @@ ansible-playbook playbook.yml -e @vars.yml
 
 ## Variables (vars.yml)
 
-- **backend_ip** – Backend VM public IP
-- **frontend_ip** – Frontend VM public IP
-- **ansible_user** – SSH user on the VMs
+- **todoops_app_vm_ip** – Public IP of `todoops-app-vm` (same as Terraform output `todoops_app_vm_public_ip`)
+- **ansible_user** – SSH user on the VM (typically `ubuntu`)
 - **ansible_ssh_private_key_file** – Path to SSH private key
 
 ## What the playbook does
 
-- Installs Docker from the Ubuntu repository (docker.io).
+- Installs Docker from the Ubuntu repository (`docker.io`).
 - Starts and enables the Docker service.
-- Adds the SSH user to the docker group.
-
-## Run on one host
-
-```bash
-ansible-playbook playbook.yml -e @vars.yml --limit backend
-```
+- Adds the SSH user to the `docker` group.

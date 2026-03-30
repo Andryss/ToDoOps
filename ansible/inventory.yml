@@ -1,12 +1,8 @@
-# Hosts use backend_ip, frontend_ip from vars.yml
+# todoops_app_vm_ip from vars.yml (terraform output todoops_app_vm_public_ip)
 
 all:
   children:
-    backend:
+    todoops:
       hosts:
-        backend_vm:
-          ansible_host: "{{ backend_ip | default('REPLACE_WITH_BACKEND_IP') }}"
-    frontend:
-      hosts:
-        frontend_vm:
-          ansible_host: "{{ frontend_ip | default('REPLACE_WITH_FRONTEND_IP') }}"
+        todoops_app_vm:
+          ansible_host: "{{ todoops_app_vm_ip | default('REPLACE_WITH_TODOOPS_APP_VM_PUBLIC_IP') }}"

@@ -1,8 +1,8 @@
 ---
-# Install Docker on backend and frontend VMs. Run: ansible-playbook playbook.yml -e @vars.yml
+# Install Docker on todoops-app-vm. Run: ansible-playbook playbook.yml -e @vars.yml
 
-- name: Install Docker on ToDoOps VMs
-  hosts: all
+- name: Install Docker on ToDoOps application VM
+  hosts: todoops
   become: true
   tasks:
     - name: Install Docker from Ubuntu repository

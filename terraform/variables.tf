@@ -1,7 +1,7 @@
 # Input variables
 
 variable "service_account_key_file" {
-  description = "Path to Yandex Cloud service account key JSON file (see service-account-key.example.json)"
+  description = "Path to Yandex Cloud service account key JSON (see service-account-key.example.json). Create key: https://yandex.cloud/ru/docs/iam/operations/authentication/manage-authorized-keys#create-authorized-key"
   type        = string
   default     = ""
   sensitive   = true

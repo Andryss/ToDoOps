@@ -1,12 +1,9 @@
 # Copy to vars.yml and set your values. Do not commit vars.yml.
 
-# Backend VM public IP
-backend_ip: "10.0.0.1"
+# todoops-app-vm public IP (terraform: terraform output -raw todoops_app_vm_public_ip)
+todoops_app_vm_ip: "10.0.0.1"
 
-# Frontend VM public IP
-frontend_ip: "10.0.0.2"
-
-# SSH user on the VMs
+# SSH user on the VM
 ansible_user: ubuntu
 
 # Path to SSH private key
