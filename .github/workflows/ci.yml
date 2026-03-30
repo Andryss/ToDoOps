@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - lab1
+      - lab2
 
 jobs:
   backend-test:
