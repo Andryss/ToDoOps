@@ -1,0 +1,39 @@
+---
+# Deploy compose files and run `docker compose up` (pull latest images). Requires community.docker and install-docker.yml done first.
+# Run: ansible-galaxy collection install -r requirements.yml
+#      ansible-playbook compose-up.yml -e @vars.yml
+
+- name: Start ToDoOps stack with Docker Compose v2
+  hosts: todoops
+  become: true
+  tasks:
+    - name: Ensure compose project directory exists
+      ansible.builtin.file:
+        path: "{{ todoops_compose_project_dir }}"
+        state: directory
+        mode: "0755"
+
+    - name: Install docker-compose.yml
+      ansible.builtin.copy:
+        src: conf/docker-compose.yml
+        dest: "{{ todoops_compose_project_dir }}/docker-compose.yml"
+        mode: "0644"
+
+    - name: Render .env for Compose variable substitution
+      ansible.builtin.template:
+        src: conf/todoops.env.template.j2
+        dest: "{{ todoops_compose_project_dir }}/.env"
+        mode: "0600"
+
+    - name: Pull images and start stack
+      community.docker.docker_compose_v2:
+        project_src: "{{ todoops_compose_project_dir }}"
+        files:
+          - docker-compose.yml
+        env_files:
+          - .env
+        state: present
+        pull: always
+        build: never
+        wait: true
+        wait_timeout: 300

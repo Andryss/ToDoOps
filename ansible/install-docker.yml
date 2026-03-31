@@ -1,13 +1,15 @@
 ---
-# Install Docker on todoops-app-vm. Run: ansible-playbook playbook.yml -e @vars.yml
+# Install Docker Engine and Docker Compose v2 plugin (Ubuntu). Run: ansible-playbook install-docker.yml -e @vars.yml
 
-- name: Install Docker on ToDoOps application VM
+- name: Install Docker and Compose plugin on ToDoOps VM
   hosts: todoops
   become: true
   tasks:
-    - name: Install Docker from Ubuntu repository
+    - name: Install Docker and docker-compose-v2
       ansible.builtin.apt:
-        name: docker.io
+        name:
+          - docker.io
+          - docker-compose-v2
         state: present
         update_cache: true
 

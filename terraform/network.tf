@@ -27,6 +27,20 @@ resource "yandex_vpc_security_group" "ssh_inbound" {
   }
 }
 
+# Security group: inbound HTTP on default port 80
+resource "yandex_vpc_security_group" "http_inbound" {
+  name        = "http_inbound"
+  description = "Allow HTTP inbound to VM"
+  network_id  = yandex_vpc_network.todoops.id
+
+  ingress {
+    description    = "HTTP"
+    protocol       = "TCP"
+    v4_cidr_blocks = ["0.0.0.0/0"]
+    port           = 80
+  }
+}
+
 # Security group: outbound all
 resource "yandex_vpc_security_group" "all_outbound" {
   name        = "all_outbound"

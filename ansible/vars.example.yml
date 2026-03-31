@@ -8,3 +8,14 @@ ansible_user: ubuntu
 
 # Path to SSH private key
 ansible_ssh_private_key_file: "~/.ssh/id_rsa"
+
+# Where compose project is stored on the VM
+todoops_compose_project_dir: /opt/todoops/compose
+
+# Application images (Postgres is pinned in conf/docker-compose.yml)
+todoops_backend_image: "YOUR_DOCKERHUB_USER/todoops-backend:latest"
+todoops_frontend_image: "YOUR_DOCKERHUB_USER/todoops-frontend:latest"
+
+todoops_postgres_db: todoops
+todoops_postgres_user: postgres
+todoops_postgres_password: "change-me"

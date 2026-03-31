@@ -1,0 +1,22 @@
+---
+# docker compose down (containers/networks only; named volumes are kept). Requires existing .env from compose-up.
+# Run: ansible-playbook compose-down.yml -e @vars.yml
+
+- name: Stop ToDoOps Compose stack
+  hosts: todoops
+  become: true
+  tasks:
+    - name: Check compose file on host
+      ansible.builtin.stat:
+        path: "{{ todoops_compose_project_dir }}/docker-compose.yml"
+      register: todoops_compose_file
+
+    - name: docker compose down
+      community.docker.docker_compose_v2:
+        project_src: "{{ todoops_compose_project_dir }}"
+        files:
+          - docker-compose.yml
+        env_files:
+          - .env
+        state: absent
+      when: todoops_compose_file.stat.exists

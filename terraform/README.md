@@ -36,7 +36,7 @@ terraform apply
 ## What Terraform creates
 
 - **Network** – VPC and subnet (10.0.1.0/24).
-- **Security groups** – ssh_inbound (SSH), all_outbound (egress).
+- **Security groups** – ssh_inbound (TCP 22), http_inbound (TCP 80), all_outbound (egress).
 - **Application VM** (`todoops-app-vm`) – Ubuntu, 2 cores, 4 GB RAM, public IP (hosts both frontend and backend).
 
 ## Outputs
