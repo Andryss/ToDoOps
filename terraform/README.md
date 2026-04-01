@@ -38,6 +38,7 @@ terraform apply
 - **Network** – VPC, subnet for VM (10.0.1.0/24), subnet for Kubernetes (10.0.2.0/24).
 - **Security groups** – ssh_inbound (TCP 22), http_inbound (TCP 80), all_outbound (egress), k8s (API 443, node-to-node, egress).
 - **Application VM** (`todoops-app-vm`) – Ubuntu, 2 cores, 4 GB RAM, public IP (hosts both frontend and backend).
+- **Load Testing** – [`yandex_loadtesting_agent`](https://registry.terraform.io/providers/yandex-cloud/yandex/latest/docs/resources/loadtesting_agent): agent VM in the app subnet. See [Load Testing – Terraform reference](https://yandex.cloud/docs/load-testing/tf-ref).
 - **Kubernetes** – Managed cluster + node group (service account, IAM roles, zonal master, public API).
 
 ## Outputs

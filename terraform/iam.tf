@@ -1,5 +1,6 @@
-# Service account and IAM roles for Yandex Managed Kubernetes.
-# The cluster and nodes use this SA to manage resources and pull images.
+# Service accounts and folder IAM roles.
+
+# --- Kubernetes
 
 resource "yandex_iam_service_account" "k8s" {
   name        = "todoops-k8s-sa"
@@ -32,4 +33,18 @@ resource "yandex_resourcemanager_folder_iam_member" "k8s_registry_puller" {
   folder_id = var.folder_id
   role      = "container-registry.images.puller"
   member    = "serviceAccount:${yandex_iam_service_account.k8s.id}"
+}
+
+# --- Load Testing
+
+resource "yandex_iam_service_account" "loadtesting" {
+  name        = "todoops-loadtesting-sa"
+  description = "Service account for Load Testing agent"
+}
+
+# Required for performing load testing from related service account.
+resource "yandex_resourcemanager_folder_iam_member" "loadtesting_generator_client" {
+  folder_id = var.folder_id
+  role      = "loadtesting.generatorClient"
+  member    = "serviceAccount:${yandex_iam_service_account.loadtesting.id}"
 }
