@@ -1,61 +1,27 @@
-# Terraform – ToDoOps VM in Yandex Cloud
+# Terraform
 
-Creates application VM, network, security groups, and optionally a **Kubernetes cluster** (Yandex Managed Service for Kubernetes) in Yandex Cloud.
+Infrastructure for ToDoOps on **Yandex Cloud** is split into **two root modules** with **separate state** and **separate VPCs** (no shared network between the VM stack and the Kubernetes stack unless you add peering yourself).
 
-## Prerequisites
+| Directory | What it creates |
+|-----------|-----------------|
+| **`terraform-vm/`** | VPC, subnet `10.0.1.0/24`, security groups, **`todoops-app-vm`** (SSH + HTTP). |
+| **`terraform-k8s/`** | Its own VPC, subnet `10.0.2.0/24`, Managed Kubernetes cluster + nodes, security groups, **Yandex Load Testing** agent + service account. |
 
-- Terraform 1.0+.
-- Yandex Cloud account: cloud ID, folder ID, and a service account key file (JSON). How to create the key: [Yandex Cloud – authorized keys](https://yandex.cloud/ru/docs/iam/operations/authentication/manage-authorized-keys#create-authorized-key).
+You can apply either stack first; they do not read each other’s state.
 
-## Configuration
+## Auth and variables
 
-Copy the example variables and set your values:
+Place a real service account key JSON as **`service-account-key.json`** next to this file. Shape: **`service-account-key.example.json`**. [Create an authorized key](https://yandex.cloud/ru/docs/iam/operations/authentication/manage-authorized-keys#create-authorized-key).
 
-```bash
-cp terraform.example.tfvars terraform.tfvars
-# Edit terraform.tfvars: cloud_id, folder_id, service_account_key_file, default_zone, ssh_public_key_path
-```
+**`terraform.tfvars`** exists in **`terraform/`**, **`terraform-vm/`**, and **`terraform-k8s/`** (all gitignored). Keep **`cloud_id`**, **`folder_id`**, and **`default_zone`** aligned across them. Key path: **`service-account-key.json`** in the parent `terraform/` folder vs **`../service-account-key.json`** inside each stack. Committed templates: **`terraform.example.tfvars`** (here) and **`terraform.example.tfvars`** in each subdirectory.
 
-## Run
-
-```bash
-cd terraform
-terraform init
-terraform plan
-terraform apply
-```
-
-## Variables (terraform.tfvars)
-
-- **cloud_id** – Yandex Cloud ID
-- **folder_id** – Yandex Cloud folder ID
-- **service_account_key_file** – Path to service account key JSON (see `service-account-key.example.json`; [create a key in the console](https://yandex.cloud/ru/docs/iam/operations/authentication/manage-authorized-keys#create-authorized-key))
-- **default_zone** – Availability zone (default: ru-central1-a)
-- **ssh_public_key_path** – Path to SSH public key for VM access
-
-## What Terraform creates
-
-- **Network** – VPC, subnet for VM (10.0.1.0/24), subnet for Kubernetes (10.0.2.0/24).
-- **Security groups** – ssh_inbound (TCP 22), http_inbound (TCP 80), all_outbound (egress), k8s (API 443, node-to-node, egress).
-- **Application VM** (`todoops-app-vm`) – Ubuntu, 2 cores, 4 GB RAM, public IP (hosts both frontend and backend).
-- **Load Testing** – [`yandex_loadtesting_agent`](https://registry.terraform.io/providers/yandex-cloud/yandex/latest/docs/resources/loadtesting_agent): agent VM in the app subnet. See [Load Testing – Terraform reference](https://yandex.cloud/docs/load-testing/tf-ref).
-- **Kubernetes** – Managed cluster + node group (service account, IAM roles, zonal master, public API).
-
-## Outputs
-
-After apply, use outputs for SSH or Ansible:
+## Commands
 
 ```bash
-terraform output todoops_app_vm_public_ip
-terraform output todoops_app_vm_fqdn
+cd terraform/terraform-vm    # or terraform/terraform-k8s
+terraform init && terraform apply
 ```
 
-For Kubernetes, get kubeconfig with Yandex CLI (install `yc` and run `yc init`):
+Run **`terraform init`** in each directory the first time (each stack has its own **`.terraform.lock.hcl`**).
 
-```bash
-terraform output -raw k8s_cluster_id   # use this as <cluster_id>
-yc managed-kubernetes cluster get-credentials <cluster_id> --external
-kubectl get nodes
-```
-
-Then deploy the app (including PostgreSQL) from the `k8s/` directory; see `k8s/README.md`.
+More detail: **`terraform-vm/README.md`**, **`terraform-k8s/README.md`**.

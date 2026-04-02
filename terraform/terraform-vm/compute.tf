@@ -25,8 +25,8 @@ resource "yandex_compute_instance" "app" {
   }
 
   network_interface {
-    subnet_id          = yandex_vpc_subnet.todoops.id
-    nat                = true
+    subnet_id = yandex_vpc_subnet.todoops.id
+    nat       = true
     security_group_ids = [
       yandex_vpc_security_group.ssh_inbound.id,
       yandex_vpc_security_group.http_inbound.id,

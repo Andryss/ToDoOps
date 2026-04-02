@@ -3,7 +3,7 @@
 resource "yandex_kubernetes_cluster" "todoops" {
   name        = "todoops-k8s"
   description = "Kubernetes cluster for ToDoOps"
-  network_id  = yandex_vpc_network.todoops.id
+  network_id  = yandex_vpc_network.k8s.id
 
   master {
     zonal {
@@ -25,7 +25,7 @@ resource "yandex_kubernetes_node_group" "todoops" {
   cluster_id  = yandex_kubernetes_cluster.todoops.id
   name        = "todoops-node-group"
   description = "Node group for ToDoOps workloads"
-  version     = null # use cluster default
+  version     = null
 
   instance_template {
     platform_id = "standard-v3"
