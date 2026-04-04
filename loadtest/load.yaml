@@ -1,0 +1,62 @@
+# Yandex Tank: нагрузка на backend ToDoOps.
+
+# Жёсткий срок теста + стоп при перегрузе потоков.
+autostop:
+  enabled: true
+  package: yandextank.plugins.Autostop
+  autostop:
+    - limit(21m)
+    - instances(90%,5s)
+
+# Генератор HTTP-нагрузки.
+pandora:
+  enabled: true
+  package: yandextank.plugins.Pandora
+  config_content:
+    pools:
+      - id: todoops_backend
+        gun:
+          type: http
+          target: localhost:8081
+          ssl: false
+        ammo:
+          type: uri
+          uris:
+            - /api/v1/tasks?page=0&size=20
+            - /api/v1/tasks?page=1&size=10
+            - /api/v1/tasks/1
+            - /api/v1/tasks/2
+            - /api/v1/tasks/3
+          headers:
+            - "[Host: localhost]"
+            - "[Connection: close]"
+            - "[Accept: */*]"
+        # Сырые результаты для отчёта Tank.
+        result:
+          type: phout
+          destination: ./phout.log
+        # Одноразовый запуск пула; times — верхняя граница «патронов» на весь прогон.
+        startup:
+          type: once
+          times: 100000
+        # Нарастание RPS 10 мин, плато 10 мин — всего 20 мин (limit чуть с запасом).
+        rps:
+          - type: line
+            from: 5
+            to: 50
+            duration: 10m
+          - type: const
+            ops: 50
+            duration: 10m
+        # true: жёсткое расписание RPS, длительность теста предсказуема; опоздавшие запросы отбрасываются (см. discard overflow в Pandora).
+        discard_overflow: true
+    log:
+      level: error
+
+# Вывод метрик в консоль во время прогона.
+console:
+  enabled: true
+  package: yandextank.plugins.Console
+
+# Секция ядра Tank; пустой объект — валидный минимум (в консоли Load Testing сюда же обычно дописывают uploader).
+core: {}
