@@ -28,4 +28,8 @@ resource "yandex_loadtesting_agent" "todoops" {
       security_group_ids = [yandex_vpc_security_group.loadtesting_agent.id]
     }
   }
+
+  log_settings {
+
+  }
 }

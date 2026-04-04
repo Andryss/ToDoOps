@@ -34,7 +34,33 @@ Applying everything at once is possible; the backend may restart until Postgres 
 
 ## Ingress and local access
 
-- **Ingress (`ingress.yaml`):** requires an **NGINX Ingress Controller** in the cluster and a LoadBalancer-capable setup; see [Yandex: Ingress + NLB](https://yandex.cloud/en/docs/managed-kubernetes/operations/create-load-balancer-with-ingress-nginx). IAM for the cluster SA is already set in Terraform **`iam.tf`** for LB use.
-- **Without Ingress:** **`kubectl port-forward -n todoops svc/frontend 8080:80`** (UI) and **`svc/backend 8081:8080`** (API).
+Full guide: [Creating a network load balancer using an NGINX ingress controller](https://yandex.cloud/en/docs/managed-kubernetes/operations/create-load-balancer-with-ingress-nginx) (Yandex Managed Kubernetes). The cluster service account needs **`load-balancer.admin`** (already granted in Terraform **`iam.tf`**).
 
-Load tests from the repo: **`../loadtest/`**.
+### 1. NGINX Ingress Controller (Helm)
+
+Install [Helm](https://helm.sh/) and **`kubectl`** for the cluster, then run (same commands as in the doc):
+
+```bash
+helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+helm repo update
+```
+
+**External** network load balancer (default chart install):
+
+```bash
+helm install ingress-nginx ingress-nginx/ingress-nginx
+```
+
+Wait for the controller **LoadBalancer** external IP:
+
+```bash
+kubectl --namespace default get services -o wide -w ingress-nginx-controller
+```
+
+### 2. ToDoOps `ingress.yaml`
+
+After the controller is up and has an address, apply this repository’s Ingress resource:
+
+```bash
+kubectl apply -f ingress.yaml
+```
