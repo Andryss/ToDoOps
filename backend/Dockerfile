@@ -7,8 +7,10 @@ COPY src ./src/
 RUN mvn package -DskipTests -Dcheckstyle.skip=true -B
 
 # Stage 2: run
-FROM eclipse-temurin:17-jre-jammy
+FROM openjdk:17.0.1-jdk-slim
 WORKDIR /opt/app
+
+RUN mkdir -p /opt/app/logs
 
 COPY --from=build /app/target/backend-*.jar backend.jar
 
