@@ -8,7 +8,6 @@ RUN npm ci
 COPY public ./public
 COPY src ./src
 COPY tsconfig.json ./
-ENV REACT_APP_API_URL=/api/v1
 RUN npm run build
 
 # Stage 2: serve
