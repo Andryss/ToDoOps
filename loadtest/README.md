@@ -8,7 +8,7 @@ This directory holds a **Yandex Tank** job that hits the ToDoOps **backend HTTP 
 |--------|------|
 | **`autostop`** | Stops the run after **`limit(21m)`** and aborts if generator threads stay overloaded (**`instances(90%,5s)`**), so results stay interpretable. |
 | **`pandora`** | **Pandora** drives **GET** requests to **`gun.target`** using the listed **`uris`** (task list with two page sizes, then **`/api/v1/tasks/{1,2,3}`**). Headers use Pandora’s **`[Name: value]`** format. |
-| **`rps`** | About **20 minutes** of load: **10 min** ramp **5 → 50 RPS**, then **10 min** flat **50 RPS**. |
+| **`rps`** | About **20 minutes** of load: **10 min** ramp **5 → 30 RPS**, then **10 min** flat **30 RPS**. |
 | **`discard_overflow: true`** | Keeps to the time schedule; requests that miss their slot are dropped instead of stretching the test. |
 | **`console` / `core`** | Console output during the run; **`core`** is a minimal stub (Yandex Cloud UI often adds **`uploader`** here). |
 
