@@ -1,0 +1,11 @@
+# Values for prometheus-community/kube-prometheus-stack (Prometheus Operator + Prometheus + Grafana + Alertmanager + kube-state-metrics + node-exporter, etc.).
+# Chart: https://artifacthub.io/packages/helm/prometheus-community/kube-prometheus-stack
+# Grafana reads admin credentials from todoops-secrets (apply secret.yaml before or with this release).
+
+grafana:
+  service:
+    type: LoadBalancer
+  admin:
+    existingSecret: todoops-secrets
+    userKey: GRAFANA_ADMIN_USER
+    passwordKey: GRAFANA_ADMIN_PASSWORD

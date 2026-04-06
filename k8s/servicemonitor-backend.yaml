@@ -1,0 +1,20 @@
+# ServiceMonitor: Prometheus Operator scrapes Spring Boot Actuator (Micrometer) on the backend Service.
+# Requires kube-prometheus-stack (or another Prometheus Operator install) to be applied first.
+#
+# The label "release" MUST match your Helm release name for kube-prometheus-stack (default in README: kps).
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: backend
+  namespace: todoops
+  labels:
+    release: kps-monitor
+spec:
+  selector:
+    matchLabels:
+      app: backend
+  endpoints:
+    - port: http
+      path: /actuator/prometheus
+      interval: 15s
+      scheme: http

@@ -1,6 +1,6 @@
-# Ingress: routes HTTP traffic to the frontend (which proxies /api/ to backend).
-# Requires the NGINX Ingress Controller to be installed (see k8s/README.md, section "Ingress controller (NGINX)").
-# Use the controller's EXTERNAL-IP in browser, or set rules[].host to your domain and point DNS.
+# Ingress: routes HTTP traffic to the frontend (which proxies /api/v1 to the backend).
+# Apply after the NGINX Ingress Controller is installed (see k8s/README.md §3).
+# Yandex NLB + ingress-nginx: https://yandex.cloud/en/docs/managed-kubernetes/operations/create-load-balancer-with-ingress-nginx
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:

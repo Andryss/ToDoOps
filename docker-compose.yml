@@ -30,8 +30,8 @@ services:
   frontend:
     build: ./frontend
     environment:
-      BACKEND_URL: http://backend:8080/api/
-      API_LOCATION: /api/
+      BACKEND_URL: http://backend:8080
+      API_LOCATION: /api/v1
     ports:
       - "3000:80"
     depends_on:
