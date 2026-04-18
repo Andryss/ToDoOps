@@ -26,6 +26,9 @@ metadata:
 spec:
   serviceName: postgres
   replicas: 1
+  persistentVolumeClaimRetentionPolicy:
+    whenDeleted: Delete
+    whenScaled: Retain
   selector:
     matchLabels:
       app: postgres
