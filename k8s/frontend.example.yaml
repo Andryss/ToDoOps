@@ -26,7 +26,7 @@ spec:
             - containerPort: 80
           env:
             - name: BACKEND_URL
-              value: "http://backend:8080"
+              value: "http://backend.todoops.svc.cluster.local:8080"
             - name: API_LOCATION
               value: "/api/v1"
 ---
@@ -35,6 +35,8 @@ kind: Service
 metadata:
   name: frontend
   namespace: todoops
+  labels:
+    app: frontend
 spec:
   selector:
     app: frontend

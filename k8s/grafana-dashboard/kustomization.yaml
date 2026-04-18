@@ -1,0 +1,12 @@
+# ConfigMap for Grafana sidecar (label grafana_dashboard=1). Apply from k8s/: kubectl apply -k grafana-dashboard/
+# Sections use markdown text panels as headers; metrics are timeseries only (no row/collapse panels).
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: todoops
+configMapGenerator:
+  - name: grafana-dashboard-todoops-backend
+    files:
+      - todoops-backend.json
+    options:
+      labels:
+        grafana_dashboard: "1"
