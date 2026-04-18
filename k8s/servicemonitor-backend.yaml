@@ -13,6 +13,9 @@ spec:
   selector:
     matchLabels:
       app: backend
+  namespaceSelector:
+    matchNames:
+      - todoops
   endpoints:
     - port: http
       path: /actuator/prometheus

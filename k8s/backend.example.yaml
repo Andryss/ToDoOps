@@ -65,6 +65,8 @@ kind: Service
 metadata:
   name: backend
   namespace: todoops
+  labels:
+    app: backend
 spec:
   selector:
     app: backend
