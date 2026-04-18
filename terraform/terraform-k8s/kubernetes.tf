@@ -31,13 +31,13 @@ resource "yandex_kubernetes_node_group" "todoops" {
     platform_id = "standard-v3"
 
     resources {
-      cores  = 2
-      memory = 2
+      cores  = 4
+      memory = 8
     }
 
     boot_disk {
       type = "network-hdd"
-      size = 30
+      size = 40
     }
 
     network_interface {

@@ -1,6 +1,6 @@
 # terraform-k8s
 
-Provisions **Yandex Managed Kubernetes**: a **dedicated VPC** (`todoops-k8s-network`), subnet **`10.0.2.0/24`**, cluster **`todoops-k8s`** with a fixed-size node group (2 nodes in the example config), security groups for the API and NodePorts, plus a **Yandex Load Testing** agent VM in the same subnet (egress-only security group, separate service account with `loadtesting.generatorClient`).
+Provisions **Yandex Managed Kubernetes**: a **dedicated VPC** (`todoops-k8s-network`), subnet **`10.0.2.0/24`**, cluster **`todoops-k8s`** with a fixed-size node group (**2 nodes, 4 vCPU / 8 GiB RAM each**), security groups for the API and NodePorts, plus a **Yandex Load Testing** agent VM in the same subnet (egress-only security group, separate service account with `loadtesting.generatorClient`).
 
 Folder IAM for the cluster service account is in **`iam.tf`** (`k8s.clusters.agent`, `vpc.publicAdmin`, `load-balancer.admin`, `container-registry.images.puller`, etc.).
 
