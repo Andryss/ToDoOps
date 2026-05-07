@@ -1,5 +1,8 @@
 package ru.andart.todoops.controller;
 
+import java.util.List;
+
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.RestController;
 import ru.andart.todoops.converter.TaskConverter;
@@ -11,11 +14,6 @@ import ru.andart.todoops.generated.model.TaskResponse;
 import ru.andart.todoops.generated.model.TaskStatusRequest;
 import ru.andart.todoops.generated.model.TaskUpdateRequest;
 import ru.andart.todoops.service.TaskService;
-
-import java.util.List;
-import java.util.stream.Collectors;
-
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * REST controller for task API. Logs each request.
@@ -44,7 +42,7 @@ public class TasksApiImpl implements TasksApi {
         Page<TaskEntity> slice = taskService.list(page, size);
         List<TaskResponse> content = slice.getContent().stream()
                 .map(taskConverter::toResponse)
-                .collect(Collectors.toList());
+                .toList();
         return new TaskPageResponse()
                 .content(content)
                 .totalElements(slice.getTotalElements())

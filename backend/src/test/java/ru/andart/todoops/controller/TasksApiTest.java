@@ -1,8 +1,12 @@
 package ru.andart.todoops.controller;
 
+import java.util.stream.Stream;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.test.json.JsonCompareMode;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -258,9 +262,10 @@ class TasksApiTest extends BaseApiTest {
                 .andExpect(content().json(expectedJson, JsonCompareMode.LENIENT));
     }
 
-    @Test
+    @ParameterizedTest
+    @MethodSource("provideCreateTaskReturns400Data")
     @SneakyThrows
-    void createTaskMissingTitleReturns400() {
+    void createTaskReturns400(String content) {
         String expectedJson = """
                 {
                     "code": 400,
@@ -269,39 +274,7 @@ class TasksApiTest extends BaseApiTest {
                 """;
         mockMvc.perform(post("/api/v1/tasks")
                         .contentType(APPLICATION_JSON)
-                        .content("{\"description\": \"Only description\"}"))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().json(expectedJson, JsonCompareMode.LENIENT));
-    }
-
-    @Test
-    @SneakyThrows
-    void createTaskEmptyTitleReturns400() {
-        String expectedJson = """
-                {
-                    "code": 400,
-                    "message": "validation.error"
-                }
-                """;
-        mockMvc.perform(post("/api/v1/tasks")
-                        .contentType(APPLICATION_JSON)
-                        .content("{\"title\": \"\", \"description\": \"Desc\"}"))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().json(expectedJson, JsonCompareMode.LENIENT));
-    }
-
-    @Test
-    @SneakyThrows
-    void createTaskMissingDescriptionReturns400() {
-        String expectedJson = """
-                {
-                    "code": 400,
-                    "message": "validation.error"
-                }
-                """;
-        mockMvc.perform(post("/api/v1/tasks")
-                        .contentType(APPLICATION_JSON)
-                        .content("{\"title\": \"Only title\"}"))
+                        .content(content))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().json(expectedJson, JsonCompareMode.LENIENT));
     }
@@ -457,5 +430,13 @@ class TasksApiTest extends BaseApiTest {
         String json = result.getResponse().getContentAsString();
         JsonNode node = objectMapper.readTree(json);
         return node.get("id").asLong();
+    }
+
+    private static Stream<String> provideCreateTaskReturns400Data() {
+        return Stream.of(
+                "{\"description\": \"Only description\"}", // missing title
+                "{\"title\": \"\", \"description\": \"Desc\"}", // empty title
+                "{\"title\": \"Only title\"}" // missing description
+        );
     }
 }
