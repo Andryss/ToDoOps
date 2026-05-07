@@ -1,0 +1,22 @@
+---
+# docker compose down (containers/networks; named volumes kept). Requires prior compose-up with .env.
+# Run: ansible-playbook compose-down.yml -e @vars.yml
+
+- name: Stop SonarQube Compose stack
+  hosts: sonarqube
+  become: true
+  tasks:
+    - name: Check compose file on host
+      ansible.builtin.stat:
+        path: "{{ sonarqube_compose_project_dir }}/docker-compose.yml"
+      register: sonarqube_compose_file
+
+    - name: docker compose down
+      community.docker.docker_compose_v2:
+        project_src: "{{ sonarqube_compose_project_dir }}"
+        files:
+          - docker-compose.yml
+        env_files:
+          - .env
+        state: absent
+      when: sonarqube_compose_file.stat.exists

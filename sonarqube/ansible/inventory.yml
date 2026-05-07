@@ -1,0 +1,8 @@
+# sonarqube_vm_ip from vars.yml (terraform output sonarqube_vm_public_ip from terraform/terraform-cicd)
+
+all:
+  children:
+    sonarqube:
+      hosts:
+        sonarqube_vm:
+          ansible_host: "{{ sonarqube_vm_ip | default('REPLACE_WITH_SONARQUBE_VM_PUBLIC_IP') }}"

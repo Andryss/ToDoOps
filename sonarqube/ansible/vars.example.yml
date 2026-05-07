@@ -1,0 +1,13 @@
+# Copy to vars.yml and set your values. Do not commit vars.yml.
+
+# todoops-sonarqube-vm public IP (cd terraform/terraform-cicd && terraform output -raw sonarqube_vm_public_ip)
+sonarqube_vm_ip: "10.0.0.1"
+
+ansible_user: ubuntu
+ansible_ssh_private_key_file: "~/.ssh/id_rsa"
+
+# Where the compose project is stored on the VM
+sonarqube_compose_project_dir: /opt/sonarqube/compose
+
+# PostgreSQL password for SonarQube JDBC (must match docker-compose substitution)
+sonarqube_jdbc_password: "change-me-strong-secret"

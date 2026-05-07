@@ -1,0 +1,39 @@
+---
+# Deploy compose file from conf/ and run docker compose up. Requires community.docker and install-docker.yml first.
+# Run: ansible-galaxy collection install -r requirements.yml
+#      ansible-playbook compose-up.yml -e @vars.yml
+
+- name: Start SonarQube stack with Docker Compose v2
+  hosts: sonarqube
+  become: true
+  tasks:
+    - name: Ensure compose project directory exists
+      ansible.builtin.file:
+        path: "{{ sonarqube_compose_project_dir }}"
+        state: directory
+        mode: "0755"
+
+    - name: Install docker-compose.yml
+      ansible.builtin.copy:
+        src: conf/docker-compose.yml
+        dest: "{{ sonarqube_compose_project_dir }}/docker-compose.yml"
+        mode: "0644"
+
+    - name: Render .env for Compose
+      ansible.builtin.template:
+        src: conf/sonarqube.env.j2
+        dest: "{{ sonarqube_compose_project_dir }}/.env"
+        mode: "0600"
+
+    - name: Pull images and start stack
+      community.docker.docker_compose_v2:
+        project_src: "{{ sonarqube_compose_project_dir }}"
+        files:
+          - docker-compose.yml
+        env_files:
+          - .env
+        state: present
+        pull: always
+        build: never
+        wait: true
+        wait_timeout: 300
