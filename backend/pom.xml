@@ -27,6 +27,7 @@
 		<checkstyle-plugin.version>3.6.0</checkstyle-plugin.version>
 		<openapi-generator-plugin.version>7.8.0</openapi-generator-plugin.version>
 		<openapi-generator-plugin.package>ru.andart.todoops.generated</openapi-generator-plugin.package>
+		<jacoco-plugin.version>0.8.11</jacoco-plugin.version>
 	</properties>
 
 	<dependencies>
@@ -187,6 +188,33 @@
 								<serializableModel>true</serializableModel>
 							</configOptions>
 						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>${jacoco-plugin.version}</version>
+				<configuration>
+					<excludes>
+						<!-- exclude generated classes -->
+						<exclude>**/generated/**</exclude>
+					</excludes>
+				</configuration>
+				<executions>
+					<execution>
+						<id>prepare-agent</id>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>report</id>
+						<phase>test</phase>
+						<goals>
+							<goal>report</goal>
+						</goals>
 					</execution>
 				</executions>
 			</plugin>
