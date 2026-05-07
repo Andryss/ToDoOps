@@ -95,7 +95,11 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=Andryss_ToDoOps_e696790b-db9e-47ca-8c63-e84da8758445 -Dsonar.projectName='ToDoOps'
+        run: |
+          mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+            -Dsonar.projectKey=Andryss_ToDoOps_e696790b-db9e-47ca-8c63-e84da8758445 \
+            -Dsonar.projectName='ToDoOps' \
+            -Dsonar.qualitygate.wait=true
         working-directory: backend
 
   frontend-test:
@@ -149,11 +153,35 @@ jobs:
           CI: true
           REACT_APP_API_URL: /api/v1
 
+  frontend-analyze:
+    runs-on: ubuntu-latest
+    needs: frontend-build
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+
+      - name: Build and analyze
+        uses: SonarSource/sonarqube-scan-action@v6
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+        working-directory: frontend
+
+      - name: Fail if analyze error
+        uses: SonarSource/sonarqube-quality-gate-action@v1
+        timeout-minutes: 5
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        working-directory: frontend
+
   docker-push:
     runs-on: ubuntu-latest
     needs:
-      - backend-build
-      - frontend-build
+      - backend-analyze
+      - frontend-analyze
 
     steps:
       - name: Checkout code
