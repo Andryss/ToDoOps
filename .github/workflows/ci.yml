@@ -163,21 +163,27 @@ jobs:
         with:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
 
-      - name: Build and analyze
-        uses: SonarSource/sonarqube-scan-action@v6
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          projectBaseDir: frontend
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: frontend
+
+      - name: Run tests with coverage
+        run: npm run test:coverage
+        working-directory: frontend
+
+      - name: SonarQube Scan
+        run: npx sonar-scanner
+        working-directory: frontend
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-
-      - name: Fail if analyze error
-        uses: SonarSource/sonarqube-quality-gate-action@v1
-        timeout-minutes: 5
-        with:
-          scanMetadataReportFile: frontend/.scannerwork/report-task.txt
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
   docker-push:
     runs-on: ubuntu-latest
