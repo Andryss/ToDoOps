@@ -91,20 +91,20 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-test-
 
-      #- name: Build and analyze
-      #  env:
-      #    SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      #    SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-      #  run: |
-      #    mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
-      #      -Dsonar.projectKey=Andryss_ToDoOps_e696790b-db9e-47ca-8c63-e84da8758445 \
-      #      -Dsonar.projectName='ToDoOps' \
-      #      -Dsonar.qualitygate.wait=true
-      #  working-directory: backend
+      - name: Build and analyze
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+        run: |
+          mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+            -Dsonar.projectKey=Andryss_ToDoOps_e696790b-db9e-47ca-8c63-e84da8758445 \
+            -Dsonar.projectName='ToDoOps' \
+            -Dsonar.qualitygate.wait=true
+        working-directory: backend
 
   frontend-test:
     runs-on: ubuntu-latest
-    # needs: backend-analyze
+    needs: backend-analyze
 
     steps:
       - name: Checkout code
