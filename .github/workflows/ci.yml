@@ -87,9 +87,9 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.m2
-          key: ${{ runner.os }}-maven-test-${{ hashFiles('**/pom.xml') }}
+          key: ${{ runner.os }}-maven-analyze-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
-            ${{ runner.os }}-maven-test-
+            ${{ runner.os }}-maven-analyze-
 
       - name: Build and analyze
         env:
@@ -98,7 +98,7 @@ jobs:
         run: |
           mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
             -Dsonar.projectKey=ToDoOps-backend \
-            -Dsonar.projectName='ToDoOps' \
+            -Dsonar.projectName='ToDoOps backend' \
             -Dsonar.qualitygate.wait=true
         working-directory: backend
 
