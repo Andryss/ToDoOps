@@ -22,7 +22,7 @@ export function TaskList({
   onPageChange,
   onTaskClick,
   loading,
-}: TaskListProps) {
+}: Readonly<TaskListProps>) {
   const from = totalElements === 0 ? 0 : page * pageSize + 1;
   const to = Math.min((page + 1) * pageSize, totalElements);
 
@@ -36,9 +36,11 @@ export function TaskList({
         <>
           <div className="task-rows">
             {tasks.map((task) => (
-              <div
+              <button
                 key={task.id}
+                type="button"
                 className="task-row"
+                aria-label={`Open task: ${task.title}`}
                 onClick={() => onTaskClick(task.id)}
               >
                 <span className="task-row-title">{task.title}</span>
@@ -47,7 +49,7 @@ export function TaskList({
                     {formatDateTime(task.due_date)}
                   </span>
                 )}
-              </div>
+              </button>
             ))}
           </div>
           {totalPages > 1 && (

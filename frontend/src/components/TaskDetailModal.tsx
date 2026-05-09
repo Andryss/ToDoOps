@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import type { SyntheticEvent } from 'react';
 import { getTask, updateTask, deleteTask, changeTaskStatus } from '../api/tasksApi';
 import type { Task, TaskStatus, TaskUpdateRequest } from '../types/task';
 import { validateTaskForm, TITLE_MAX_LENGTH, DESCRIPTION_MAX_LENGTH } from '../utils/taskValidation';
@@ -36,7 +37,7 @@ export function TaskDetailModal({
   onClose,
   onSaved,
   onDeleted,
-}: TaskDetailModalProps) {
+}: Readonly<TaskDetailModalProps>) {
   const [task, setTask] = useState<Task | null>(null);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -79,8 +80,8 @@ export function TaskDetailModal({
     fetchTask();
   }, [fetchTask]);
 
-  const handleSave = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSave = async (event: SyntheticEvent<HTMLFormElement>) => {
+    event.preventDefault();
     if (!task) return;
     setFormError(null);
     const validationError = validateTaskForm(title, description);

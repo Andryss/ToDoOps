@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import type { SyntheticEvent } from 'react';
 import type { Task, TaskCreateRequest, TaskUpdateRequest } from '../types/task';
 import { validateTaskForm, TITLE_MAX_LENGTH, DESCRIPTION_MAX_LENGTH } from '../utils/taskValidation';
 import { apiDueDateToDatetimeLocal, datetimeLocalToOffsetIso } from '../utils/dateUtils';
@@ -15,7 +16,7 @@ export function TaskForm({
   onSubmit,
   onCancel,
   submitLabel,
-}: TaskFormProps) {
+}: Readonly<TaskFormProps>) {
   const [title, setTitle] = useState(initial?.title ?? '');
   const [description, setDescription] = useState(initial?.description ?? '');
   const [dueDate, setDueDate] = useState(apiDueDateToDatetimeLocal(initial?.due_date));
@@ -34,8 +35,8 @@ export function TaskForm({
     }
   }, [initial]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (event: SyntheticEvent<HTMLFormElement>) => {
+    event.preventDefault();
     setError(null);
     const validationError = validateTaskForm(title, description);
     if (validationError) {

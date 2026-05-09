@@ -97,7 +97,7 @@ jobs:
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
         run: |
           mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
-            -Dsonar.projectKey=Andryss_ToDoOps_e696790b-db9e-47ca-8c63-e84da8758445 \
+            -Dsonar.projectKey=ToDoOps-backend \
             -Dsonar.projectName='ToDoOps' \
             -Dsonar.qualitygate.wait=true
         working-directory: backend

@@ -6,7 +6,7 @@ interface ModalProps {
   children: React.ReactNode;
 }
 
-export function Modal({ title, onClose, children }: ModalProps) {
+export function Modal({ title, onClose, children }: Readonly<ModalProps>) {
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
@@ -20,16 +20,18 @@ export function Modal({ title, onClose, children }: ModalProps) {
   }, [onClose]);
 
   return (
-    <div
-      className="modal-overlay"
-      onClick={onClose}
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="modal-title"
-    >
-      <div
+    <div className="modal-overlay">
+      <button
+        type="button"
+        className="modal-backdrop"
+        aria-label="Close dialog"
+        onClick={onClose}
+      />
+      <dialog
         className="modal-box"
-        onClick={(e) => e.stopPropagation()}
+        open
+        aria-modal="true"
+        aria-labelledby="modal-title"
       >
         <div className="modal-header">
           <h2 id="modal-title" className="modal-title">{title}</h2>
@@ -45,7 +47,7 @@ export function Modal({ title, onClose, children }: ModalProps) {
         <div className="modal-body">
           {children}
         </div>
-      </div>
+      </dialog>
     </div>
   );
 }
