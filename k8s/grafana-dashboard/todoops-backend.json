@@ -35,7 +35,7 @@
       },
       "options": {
         "mode": "markdown",
-        "content": "## HTTP traffic\n"
+        "content": "## HTTP traffic\n\nUse **Backend pods** (top) to filter. **All** = every backend pod. RPS and error rates are **summed** across selected pods per URI. Mean latency is a **weighted average**; p95 merges histograms. See later sections for JVM (heap **avg** per pool), threads (**sum**), Hikari (**sum**/**merged avg**), etc.\n"
       }
     },
     {
@@ -120,8 +120,8 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "sum by (uri, pod) (rate(http_server_requests_seconds_count{application=\"todoops-backend\"}[$__rate_interval]))",
-          "legendFormat": "{{pod}} · {{uri}}",
+          "expr": "sum by (uri) (rate(http_server_requests_seconds_count{application=\"todoops-backend\",pod=~\"$backend_pod\"}[$__rate_interval]))",
+          "legendFormat": "{{uri}}",
           "datasource": {
             "type": "prometheus",
             "uid": "${datasource}"
@@ -213,8 +213,8 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "sum by (uri, pod) (rate(http_server_requests_seconds_count{application=\"todoops-backend\",status=~\"4..\"}[$__rate_interval]))",
-          "legendFormat": "{{pod}} · {{uri}}",
+          "expr": "sum by (uri) (rate(http_server_requests_seconds_count{application=\"todoops-backend\",pod=~\"$backend_pod\",status=~\"4..\"}[$__rate_interval]))",
+          "legendFormat": "{{uri}}",
           "datasource": {
             "type": "prometheus",
             "uid": "${datasource}"
@@ -306,8 +306,8 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "sum by (uri, pod) (rate(http_server_requests_seconds_count{application=\"todoops-backend\",status=~\"5..\"}[$__rate_interval]))",
-          "legendFormat": "{{pod}} · {{uri}}",
+          "expr": "sum by (uri) (rate(http_server_requests_seconds_count{application=\"todoops-backend\",pod=~\"$backend_pod\",status=~\"5..\"}[$__rate_interval]))",
+          "legendFormat": "{{uri}}",
           "datasource": {
             "type": "prometheus",
             "uid": "${datasource}"
@@ -399,8 +399,8 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "sum by (uri, pod) (rate(http_server_requests_seconds_sum{application=\"todoops-backend\"}[$__rate_interval])) / sum by (uri, pod) (rate(http_server_requests_seconds_count{application=\"todoops-backend\"}[$__rate_interval]))",
-          "legendFormat": "{{pod}} · {{uri}}",
+          "expr": "sum by (uri) (rate(http_server_requests_seconds_sum{application=\"todoops-backend\",pod=~\"$backend_pod\"}[$__rate_interval])) / sum by (uri) (rate(http_server_requests_seconds_count{application=\"todoops-backend\",pod=~\"$backend_pod\"}[$__rate_interval]))",
+          "legendFormat": "{{uri}}",
           "datasource": {
             "type": "prometheus",
             "uid": "${datasource}"
@@ -492,8 +492,8 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "histogram_quantile(0.95, sum by (le, uri, pod) (rate(http_server_requests_seconds_bucket{application=\"todoops-backend\"}[$__rate_interval])))",
-          "legendFormat": "{{pod}} · {{uri}}",
+          "expr": "histogram_quantile(0.95, sum by (le, uri) (rate(http_server_requests_seconds_bucket{application=\"todoops-backend\",pod=~\"$backend_pod\"}[$__rate_interval])))",
+          "legendFormat": "{{uri}}",
           "datasource": {
             "type": "prometheus",
             "uid": "${datasource}"
@@ -601,8 +601,8 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "jvm_memory_used_bytes{application=\"todoops-backend\",area=\"heap\"}",
-          "legendFormat": "{{pod}} · {{id}}",
+          "expr": "avg by (id) (jvm_memory_used_bytes{application=\"todoops-backend\",pod=~\"$backend_pod\",area=\"heap\"})",
+          "legendFormat": "{{id}} · avg across pods",
           "datasource": {
             "type": "prometheus",
             "uid": "${datasource}"
@@ -694,8 +694,8 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "jvm_memory_max_bytes{application=\"todoops-backend\",area=\"heap\"}",
-          "legendFormat": "{{pod}} · {{id}}",
+          "expr": "avg by (id) (jvm_memory_max_bytes{application=\"todoops-backend\",pod=~\"$backend_pod\",area=\"heap\"})",
+          "legendFormat": "{{id}} · avg across pods",
           "datasource": {
             "type": "prometheus",
             "uid": "${datasource}"
@@ -787,8 +787,8 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "jvm_threads_live_threads{application=\"todoops-backend\"}",
-          "legendFormat": "{{pod}} · live",
+          "expr": "sum(jvm_threads_live_threads{application=\"todoops-backend\",pod=~\"$backend_pod\"})",
+          "legendFormat": "live · sum pods",
           "datasource": {
             "type": "prometheus",
             "uid": "${datasource}"
@@ -798,8 +798,8 @@
         },
         {
           "refId": "B",
-          "expr": "jvm_threads_daemon_threads{application=\"todoops-backend\"}",
-          "legendFormat": "{{pod}} · daemon",
+          "expr": "sum(jvm_threads_daemon_threads{application=\"todoops-backend\",pod=~\"$backend_pod\"})",
+          "legendFormat": "daemon · sum pods",
           "datasource": {
             "type": "prometheus",
             "uid": "${datasource}"
@@ -809,8 +809,8 @@
         },
         {
           "refId": "C",
-          "expr": "jvm_threads_peak_threads{application=\"todoops-backend\"}",
-          "legendFormat": "{{pod}} · peak",
+          "expr": "max(jvm_threads_peak_threads{application=\"todoops-backend\",pod=~\"$backend_pod\"})",
+          "legendFormat": "peak · max across pods",
           "datasource": {
             "type": "prometheus",
             "uid": "${datasource}"
@@ -918,8 +918,8 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "hikaricp_connections{application=\"todoops-backend\"}",
-          "legendFormat": "{{pod}} · {{pool}} · total",
+          "expr": "sum by (pool) (hikaricp_connections{application=\"todoops-backend\",pod=~\"$backend_pod\"})",
+          "legendFormat": "{{pool}} · connections",
           "datasource": {
             "type": "prometheus",
             "uid": "${datasource}"
@@ -929,8 +929,8 @@
         },
         {
           "refId": "B",
-          "expr": "hikaricp_connections_active{application=\"todoops-backend\"}",
-          "legendFormat": "{{pod}} · {{pool}} · active",
+          "expr": "sum by (pool) (hikaricp_connections_active{application=\"todoops-backend\",pod=~\"$backend_pod\"})",
+          "legendFormat": "{{pool}} · active",
           "datasource": {
             "type": "prometheus",
             "uid": "${datasource}"
@@ -940,8 +940,8 @@
         },
         {
           "refId": "C",
-          "expr": "hikaricp_connections_idle{application=\"todoops-backend\"}",
-          "legendFormat": "{{pod}} · {{pool}} · idle",
+          "expr": "sum by (pool) (hikaricp_connections_idle{application=\"todoops-backend\",pod=~\"$backend_pod\"})",
+          "legendFormat": "{{pool}} · idle",
           "datasource": {
             "type": "prometheus",
             "uid": "${datasource}"
@@ -951,8 +951,8 @@
         },
         {
           "refId": "D",
-          "expr": "hikaricp_connections_pending{application=\"todoops-backend\"}",
-          "legendFormat": "{{pod}} · {{pool}} · pending",
+          "expr": "sum by (pool) (hikaricp_connections_pending{application=\"todoops-backend\",pod=~\"$backend_pod\"})",
+          "legendFormat": "{{pool}} · pending",
           "datasource": {
             "type": "prometheus",
             "uid": "${datasource}"
@@ -962,8 +962,8 @@
         },
         {
           "refId": "E",
-          "expr": "hikaricp_connections_min{application=\"todoops-backend\"}",
-          "legendFormat": "{{pod}} · {{pool}} · min",
+          "expr": "avg by (pool) (hikaricp_connections_min{application=\"todoops-backend\",pod=~\"$backend_pod\"})",
+          "legendFormat": "{{pool}} · min (avg)",
           "datasource": {
             "type": "prometheus",
             "uid": "${datasource}"
@@ -973,8 +973,8 @@
         },
         {
           "refId": "F",
-          "expr": "hikaricp_connections_max{application=\"todoops-backend\"}",
-          "legendFormat": "{{pod}} · {{pool}} · max",
+          "expr": "avg by (pool) (hikaricp_connections_max{application=\"todoops-backend\",pod=~\"$backend_pod\"})",
+          "legendFormat": "{{pool}} · max (avg)",
           "datasource": {
             "type": "prometheus",
             "uid": "${datasource}"
@@ -1066,8 +1066,8 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "sum by (pod) (rate(hikaricp_connections_acquire_seconds_sum{application=\"todoops-backend\"}[$__rate_interval])) / sum by (pod) (rate(hikaricp_connections_acquire_seconds_count{application=\"todoops-backend\"}[$__rate_interval]))",
-          "legendFormat": "{{pod}}",
+          "expr": "sum(rate(hikaricp_connections_acquire_seconds_sum{application=\"todoops-backend\",pod=~\"$backend_pod\"}[$__rate_interval])) / sum(rate(hikaricp_connections_acquire_seconds_count{application=\"todoops-backend\",pod=~\"$backend_pod\"}[$__rate_interval]))",
+          "legendFormat": "avg acquire time · merged",
           "datasource": {
             "type": "prometheus",
             "uid": "${datasource}"
@@ -1159,8 +1159,8 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "sum by (pod) (rate(hikaricp_connections_timeout_total{application=\"todoops-backend\"}[$__rate_interval]))",
-          "legendFormat": "{{pod}}",
+          "expr": "sum(rate(hikaricp_connections_timeout_total{application=\"todoops-backend\",pod=~\"$backend_pod\"}[$__rate_interval]))",
+          "legendFormat": "timeouts/s · sum pods",
           "datasource": {
             "type": "prometheus",
             "uid": "${datasource}"
@@ -1268,8 +1268,8 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "sum by (level, pod) (rate(logback_events_total{application=\"todoops-backend\"}[$__rate_interval]))",
-          "legendFormat": "{{pod}} · {{level}}",
+          "expr": "sum by (level) (rate(logback_events_total{application=\"todoops-backend\",pod=~\"$backend_pod\"}[$__rate_interval]))",
+          "legendFormat": "{{level}}",
           "datasource": {
             "type": "prometheus",
             "uid": "${datasource}"
@@ -1390,8 +1390,8 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "process_cpu_usage{application=\"todoops-backend\"}",
-          "legendFormat": "{{pod}} · cpu_usage",
+          "expr": "avg(process_cpu_usage{application=\"todoops-backend\",pod=~\"$backend_pod\"})",
+          "legendFormat": "process cpu · avg pods",
           "datasource": {
             "type": "prometheus",
             "uid": "${datasource}"
@@ -1401,8 +1401,8 @@
         },
         {
           "refId": "B",
-          "expr": "process_files_open_files{application=\"todoops-backend\"}",
-          "legendFormat": "{{pod}} · open_files",
+          "expr": "sum(process_files_open_files{application=\"todoops-backend\",pod=~\"$backend_pod\"})",
+          "legendFormat": "open files · sum pods",
           "datasource": {
             "type": "prometheus",
             "uid": "${datasource}"
@@ -1507,8 +1507,8 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "process_uptime_seconds{application=\"todoops-backend\"}",
-          "legendFormat": "{{pod}} · uptime_s",
+          "expr": "avg(process_uptime_seconds{application=\"todoops-backend\",pod=~\"$backend_pod\"})",
+          "legendFormat": "uptime · avg pods",
           "datasource": {
             "type": "prometheus",
             "uid": "${datasource}"
@@ -1518,8 +1518,8 @@
         },
         {
           "refId": "B",
-          "expr": "rate(process_cpu_time_ns_total{application=\"todoops-backend\"}[$__rate_interval])",
-          "legendFormat": "{{pod}} · cpu_time_ns/s",
+          "expr": "sum(rate(process_cpu_time_ns_total{application=\"todoops-backend\",pod=~\"$backend_pod\"}[$__rate_interval]))",
+          "legendFormat": "cpu time rate · sum pods",
           "datasource": {
             "type": "prometheus",
             "uid": "${datasource}"
@@ -1652,8 +1652,8 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "system_cpu_usage{application=\"todoops-backend\"}",
-          "legendFormat": "{{pod}} · sys_cpu_usage",
+          "expr": "avg(system_cpu_usage{application=\"todoops-backend\",pod=~\"$backend_pod\"})",
+          "legendFormat": "system cpu · avg pods",
           "datasource": {
             "type": "prometheus",
             "uid": "${datasource}"
@@ -1663,8 +1663,8 @@
         },
         {
           "refId": "B",
-          "expr": "system_load_average_1m{application=\"todoops-backend\"}",
-          "legendFormat": "{{pod}} · load1",
+          "expr": "avg(system_load_average_1m{application=\"todoops-backend\",pod=~\"$backend_pod\"})",
+          "legendFormat": "load 1m · avg pods",
           "datasource": {
             "type": "prometheus",
             "uid": "${datasource}"
@@ -1674,8 +1674,8 @@
         },
         {
           "refId": "C",
-          "expr": "system_cpu_count{application=\"todoops-backend\"}",
-          "legendFormat": "{{pod}} · cpu_count",
+          "expr": "avg(system_cpu_count{application=\"todoops-backend\",pod=~\"$backend_pod\"})",
+          "legendFormat": "cpu count · avg pods",
           "datasource": {
             "type": "prometheus",
             "uid": "${datasource}"
@@ -1732,8 +1732,8 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "disk_free_bytes{application=\"todoops-backend\"}",
-          "legendFormat": "{{pod}} · free {{path}}",
+          "expr": "sum(tomcat_sessions_active_current_sessions{application=\"todoops-backend\",pod=~\"$backend_pod\"})",
+          "legendFormat": "active · sum pods",
           "datasource": {
             "type": "prometheus",
             "uid": "${datasource}"
@@ -1743,8 +1743,8 @@
         },
         {
           "refId": "B",
-          "expr": "disk_total_bytes{application=\"todoops-backend\"}",
-          "legendFormat": "{{pod}} · total {{path}}",
+          "expr": "max(tomcat_sessions_active_max_sessions{application=\"todoops-backend\",pod=~\"$backend_pod\"})",
+          "legendFormat": "active max · max pods",
           "datasource": {
             "type": "prometheus",
             "uid": "${datasource}"
@@ -1852,8 +1852,8 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "tomcat_sessions_active_current_sessions{application=\"todoops-backend\"}",
-          "legendFormat": "{{pod}} · active",
+          "expr": "avg by (path) (disk_free_bytes{application=\"todoops-backend\",pod=~\"$backend_pod\"})",
+          "legendFormat": "{{path}} · free · avg pods",
           "datasource": {
             "type": "prometheus",
             "uid": "${datasource}"
@@ -1863,8 +1863,8 @@
         },
         {
           "refId": "B",
-          "expr": "tomcat_sessions_active_max_sessions{application=\"todoops-backend\"}",
-          "legendFormat": "{{pod}} · max",
+          "expr": "avg by (path) (disk_total_bytes{application=\"todoops-backend\",pod=~\"$backend_pod\"})",
+          "legendFormat": "{{path}} · total · avg pods",
           "datasource": {
             "type": "prometheus",
             "uid": "${datasource}"
@@ -1929,6 +1929,34 @@
         "refresh": 1,
         "regex": "",
         "type": "datasource"
+      },
+      {
+        "name": "backend_pod",
+        "type": "query",
+        "label": "Backend pods",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${datasource}"
+        },
+        "refresh": 2,
+        "query": "label_values(http_server_requests_seconds_count{application=\"todoops-backend\"}, pod)",
+        "regex": "",
+        "sort": 1,
+        "multi": true,
+        "includeAll": true,
+        "allValue": ".*",
+        "current": {
+          "selected": true,
+          "text": [
+            "All"
+          ],
+          "value": [
+            "$__all"
+          ]
+        },
+        "options": [],
+        "hide": 0,
+        "skipUrlSync": false
       }
     ]
   },
@@ -1940,6 +1968,6 @@
   "timezone": "browser",
   "title": "ToDoOps Backend — Application dashboard",
   "uid": "todoops-backend",
-  "version": 1,
+  "version": 2,
   "weekStart": ""
 }

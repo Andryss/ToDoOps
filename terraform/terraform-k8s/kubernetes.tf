@@ -3,7 +3,7 @@
 resource "yandex_kubernetes_cluster" "todoops" {
   name        = "todoops-k8s"
   description = "Kubernetes cluster for ToDoOps"
-  network_id  = yandex_vpc_network.k8s.id
+  network_id  = data.terraform_remote_state.common.outputs.vpc_network_id
 
   master {
     zonal {
@@ -19,6 +19,14 @@ resource "yandex_kubernetes_cluster" "todoops" {
 
   release_channel         = "REGULAR"
   network_policy_provider = "CALICO"
+
+  # https://yandex.cloud/en/docs/managed-kubernetes/operations/kubernetes-cluster/kubernetes-cluster-create
+  depends_on = [
+    yandex_resourcemanager_folder_iam_member.k8s_clusters_agent,
+    yandex_resourcemanager_folder_iam_member.k8s_vpc_public_admin,
+    yandex_resourcemanager_folder_iam_member.k8s_load_balancer_admin,
+    yandex_resourcemanager_folder_iam_member.k8s_registry_puller,
+  ]
 }
 
 resource "yandex_kubernetes_node_group" "todoops" {

@@ -1,22 +1,24 @@
-# VPC and subnet for the ToDoOps application VM.
+# Subnet + security groups on the shared VPC from ../terraform-common.
 
-resource "yandex_vpc_network" "todoops" {
-  name        = "todoops-network"
-  description = "Network for ToDoOps application VM"
+data "terraform_remote_state" "common" {
+  backend = "local"
+  config = {
+    path = "${path.module}/../terraform-common/terraform.tfstate"
+  }
 }
 
 resource "yandex_vpc_subnet" "todoops" {
-  name           = "todoops-subnet"
-  description    = "Subnet for ToDoOps application VM"
-  network_id     = yandex_vpc_network.todoops.id
+  name           = "todoops-subnet-app-vm"
+  description    = "Application VM"
+  network_id     = data.terraform_remote_state.common.outputs.vpc_network_id
   v4_cidr_blocks = ["10.0.1.0/24"]
   zone           = var.default_zone
 }
 
 resource "yandex_vpc_security_group" "ssh_inbound" {
-  name        = "ssh_inbound"
-  description = "Allow SSH inbound to VM"
-  network_id  = yandex_vpc_network.todoops.id
+  name        = "todoops-vm-ssh-inbound"
+  description = "Allow SSH inbound to application VM"
+  network_id  = data.terraform_remote_state.common.outputs.vpc_network_id
 
   ingress {
     description    = "SSH"
@@ -27,9 +29,9 @@ resource "yandex_vpc_security_group" "ssh_inbound" {
 }
 
 resource "yandex_vpc_security_group" "http_inbound" {
-  name        = "http_inbound"
-  description = "Allow HTTP inbound to VM"
-  network_id  = yandex_vpc_network.todoops.id
+  name        = "todoops-vm-http-inbound"
+  description = "Allow HTTP inbound to application VM"
+  network_id  = data.terraform_remote_state.common.outputs.vpc_network_id
 
   ingress {
     description    = "HTTP"
@@ -40,9 +42,9 @@ resource "yandex_vpc_security_group" "http_inbound" {
 }
 
 resource "yandex_vpc_security_group" "all_outbound" {
-  name        = "all_outbound"
-  description = "Allow all outbound from VM"
-  network_id  = yandex_vpc_network.todoops.id
+  name        = "todoops-vm-egress"
+  description = "Allow all outbound from application VM"
+  network_id  = data.terraform_remote_state.common.outputs.vpc_network_id
 
   egress {
     description    = "Allow all outbound"

@@ -1,14 +1,15 @@
 # terraform-k8s
 
-Provisions **Yandex Managed Kubernetes**: a **dedicated VPC** (`todoops-k8s-network`), subnet **`10.0.2.0/24`**, cluster **`todoops-k8s`** with a fixed-size node group (**2 nodes, 4 vCPU / 8 GiB RAM each**), security groups for the API and NodePorts, plus a **Yandex Load Testing** agent VM in the same subnet (egress-only security group, separate service account with `loadtesting.generatorClient`).
+Provisions **Yandex Managed Kubernetes** on the **shared** VPC from **`../terraform-common/`**: subnet **`10.0.2.0/24`**, cluster **`todoops-k8s`**, node group (**2 nodes, 4 vCPU / 8 GiB RAM each**), security groups, plus a **Yandex Load Testing** agent in the same subnet.
 
-Folder IAM for the cluster service account is in **`iam.tf`** (`k8s.clusters.agent`, `vpc.publicAdmin`, `load-balancer.admin`, `container-registry.images.puller`, etc.).
+Folder IAM for the cluster service account is in **`iam.tf`**.
 
 State lives in **`terraform.tfstate`** in this directory.
 
 ## Prerequisites
 
-Terraform ≥ 1.0, same **`cloud_id`** / **`folder_id`** / key as for other stacks in **`terraform/`** (key path usually **`../service-account-key.json`**). **`yc`** CLI helps to fetch kubeconfig after apply.
+1. Apply **`../terraform-common/`** first.
+2. Terraform ≥ 1.0, same **`cloud_id`** / **`folder_id`** / key as siblings. **`yc`** for kubeconfig.
 
 ## First run
 
@@ -28,4 +29,10 @@ yc managed-kubernetes cluster get-credentials <id> --external
 
 Deploy manifests from **`../../k8s/`**. Useful outputs: **`k8s_cluster_endpoint`**, **`k8s_cluster_ca_certificate`**, **`loadtesting_agent_id`** (for the Load Testing console).
 
-Related: **`../README.md`**, **`../terraform-vm/`** (VM is in another VPC), **`../../k8s/`**, **`../../loadtest/`** for Tank / cloud load tests.
+### `Permission denied` when creating the cluster
+
+The cluster service account must have **`k8s.clusters.agent`**, **`vpc.publicAdmin`**, **`load-balancer.admin`**, and **`container-registry.images.puller`** on the folder **before** the CreateCluster API runs. **`kubernetes.tf`** uses **`depends_on`** on those IAM bindings so Terraform does not start the cluster in parallel (a common cause of transient **Permission denied**).
+
+The identity in your Terraform provider key also needs permission to manage Kubernetes (for example **`managed-kubernetes.editor`** or **`editor`** on the folder). If it still fails, wait a minute and **`terraform apply`** again (IAM propagation).
+
+Related: **`../README.md`**, **`../terraform-common/`**, **`../terraform-vm/`** (other subnet in same VPC), **`../../k8s/`**, **`../../loadtest/`**.

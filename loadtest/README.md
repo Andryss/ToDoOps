@@ -22,7 +22,7 @@ The **managed agent** is created by **`terraform/terraform-k8s`** (`yandex_loadt
 
 1. In the [Yandex Cloud console → Load Testing](https://yandex.cloud/docs/load-testing/), create a test and select **your agent** (or use **`terraform output loadtesting_agent_id`** in **`terraform/terraform-k8s`** to identify it).
 2. Choose configuration type **YAML** (or paste the tank config as required by the wizard).
-3. Paste the contents of **`load.yaml`**, or upload it if the UI supports file attach. Align **`target`** / **`Host`** with a URL **reachable from the agent** (for example **Ingress / NLB** in front of the app — the agent runs in the k8s VPC and cannot reach **`terraform-vm`** unless you connect networks).
+3. Paste the contents of **`load.yaml`**, or upload it if the UI supports file attach. Align **`target`** / **`Host`** with a URL **reachable from the agent** (for example **Ingress / NLB** in front of the app in Kubernetes). The load agent uses the **Kubernetes subnet** of the **shared** VPC (**`terraform-common`** + **`terraform-k8s`**); it is not on the public internet by default.
 4. For cloud runs, the console usually expects an **`uploader`** block pointing at **`loadtesting.api.cloud.yandex.net:443`**; add it next to **`pandora`** per the [Load Testing docs](https://yandex.cloud/docs/load-testing/) if your test fails validation without it.
 
 Reports and history then live in the Load Testing service, not only in local **`phout.log`**.

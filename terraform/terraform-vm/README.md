@@ -1,25 +1,25 @@
 # terraform-vm
 
-Provisions the **application VM** and a small **VPC**: network **`todoops-network`**, subnet **`10.0.1.0/24`**, security groups for SSH, HTTP, and general egress, and one **`yandex_compute_instance`** (`todoops-app-vm`) with Ubuntu 22.04.
+Provisions **security groups** and **`todoops-app-vm`** (Ubuntu 22.04) on shared subnet **`10.0.1.0/24`** from **`../terraform-common/`** (VPC and subnet are **not** defined here).
 
 State lives in **`terraform.tfstate`** in this directory.
 
 ## Prerequisites
 
-Terraform ≥ 1.0, Yandex provider configured via **`service_account_key_file`** in **`terraform.tfvars`**, plus **`cloud_id`** and **`folder_id`**. SSH access uses **`ssh_public_key_path`** (default in examples: `~/.ssh/id_ed25519.pub`).
+1. Apply **`../terraform-common/`** first so **`../terraform-common/terraform.tfstate`** exists (used via **`terraform_remote_state`**).
+2. Terraform ≥ 1.0, **`service_account_key_file`**, **`cloud_id`**, **`folder_id`** in **`terraform.tfvars`**. SSH: **`ssh_public_key_path`** (e.g. `~/.ssh/id_ed25519.pub`).
 
 ## First run
 
 ```bash
 cd terraform/terraform-vm
 cp terraform.example.tfvars terraform.tfvars
-# Edit terraform.tfvars (and sync shared fields with ../terraform.tfvars if you use it)
+# Edit terraform.tfvars
 terraform init && terraform apply
 ```
 
 ## Outputs
 
-- **`todoops_app_vm_public_ip`** — use for SSH, Ansible inventory, or public HTTP to the VM.
-- **`vpc_network_id`** — this stack’s VPC only (not used by **`terraform-k8s`**, which has its own network).
+- **`todoops_app_vm_public_ip`** — SSH, Ansible, HTTP.
 
-Related: **`../README.md`**, **`../terraform-k8s/`** for the cluster stack, **`../../ansible/`** to install Docker and run Compose on the VM.
+Related: **`../README.md`**, **`../terraform-common/`**, **`../terraform-k8s/`**, **`../../ansible/`**.

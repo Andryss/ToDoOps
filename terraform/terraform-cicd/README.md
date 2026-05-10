@@ -1,6 +1,6 @@
 # terraform-cicd
 
-Provisions a **dedicated VPC** (`10.0.3.0/24`), security groups (SSH, **TCP 9000** for SonarQube UI), and **`todoops-sonarqube-vm`** (Ubuntu 22.04, 4 vCPU / 8 GiB RAM, 50 GiB disk) on **Yandex Cloud**.
+Uses the **shared** VPC from **`../terraform-common/`**: subnet **`10.0.3.0/24`**, security groups (SSH, **TCP 9000** for SonarQube UI), and **`todoops-sonarqube-vm`** (Ubuntu 22.04, 4 vCPU / 8 GiB RAM, 50 GiB disk).
 
 ## Yandex Cloud and SonarQube
 
@@ -10,7 +10,8 @@ State: **`terraform.tfstate`** in this directory (separate from **`terraform-vm/
 
 ## Prerequisites
 
-Same auth as **`../README.md`**: copy **`terraform.example.tfvars`** → **`terraform.tfvars`**, service account key path **`../service-account-key.json`**.
+1. Apply **`../terraform-common/`** first.
+2. Same auth as **`../README.md`**: **`terraform.example.tfvars`** → **`terraform.tfvars`**, key **`../service-account-key.json`**.
 
 ## Apply
 

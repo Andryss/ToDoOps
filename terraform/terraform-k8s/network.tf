@@ -1,14 +1,16 @@
-# VPC, Kubernetes subnet, and security groups (independent from terraform-vm).
+# Subnet + security groups on the shared VPC from ../terraform-common.
 
-resource "yandex_vpc_network" "k8s" {
-  name        = "todoops-k8s-network"
-  description = "Network for Managed Kubernetes and Load Testing agent"
+data "terraform_remote_state" "common" {
+  backend = "local"
+  config = {
+    path = "${path.module}/../terraform-common/terraform.tfstate"
+  }
 }
 
 resource "yandex_vpc_subnet" "k8s" {
-  name           = "todoops-k8s-subnet"
-  description    = "Subnet for Kubernetes cluster and nodes"
-  network_id     = yandex_vpc_network.k8s.id
+  name           = "todoops-subnet-k8s"
+  description    = "Managed Kubernetes + load testing agent"
+  network_id     = data.terraform_remote_state.common.outputs.vpc_network_id
   v4_cidr_blocks = ["10.0.2.0/24"]
   zone           = var.default_zone
 }
@@ -16,7 +18,7 @@ resource "yandex_vpc_subnet" "k8s" {
 resource "yandex_vpc_security_group" "k8s" {
   name        = "todoops-k8s-sg"
   description = "Security group for Kubernetes cluster and nodes"
-  network_id  = yandex_vpc_network.k8s.id
+  network_id  = data.terraform_remote_state.common.outputs.vpc_network_id
 
   ingress {
     description    = "HTTP traffic"
@@ -60,11 +62,10 @@ resource "yandex_vpc_security_group" "k8s" {
   }
 }
 
-# Egress-only SG for Load Testing agent (no duplicate rules on todoops-k8s-sg).
 resource "yandex_vpc_security_group" "loadtesting_agent" {
   name        = "todoops-loadtesting-sg"
   description = "Load Testing agent VM: outbound only"
-  network_id  = yandex_vpc_network.k8s.id
+  network_id  = data.terraform_remote_state.common.outputs.vpc_network_id
 
   egress {
     description    = "Allow all outbound"
