@@ -1,0 +1,8 @@
+# Namespace for Argo CD control plane (GitOps CD for Kubernetes).
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: argocd
+  labels:
+    app.kubernetes.io/name: argocd
+    app.kubernetes.io/part-of: argocd
