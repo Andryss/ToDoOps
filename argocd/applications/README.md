@@ -23,4 +23,4 @@ kubectl apply -f applications/ingress.yaml
 
 **`todoops-secrets`** must exist in **`todoops`** before Postgres/backend/Grafana admin work (see **`../README.md`** § Secrets). Apply **`monitoring-extension.yaml`** after **`todoops-monitoring`** (sync waves **`2`** vs **`1`**). **`ingress.yaml`** needs the **frontend** Service (wave **`3`**).
 
-Bootstrap all children: **`kubectl apply -f ../application.yaml`** (from **`argocd/`**). See **`../README.md`** § App of apps.
+Bootstrap all children from **`argocd/`**: **`kubectl apply -f application.yaml`**. See **`../README.md`** § App of apps.

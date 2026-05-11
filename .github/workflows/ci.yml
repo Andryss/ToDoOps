@@ -239,3 +239,37 @@ jobs:
             ${{ secrets.DOCKER_HUB_USERNAME }}/todoops-frontend:latest
           cache-from: type=gha,scope=frontend
           cache-to: type=gha,scope=frontend,mode=max
+
+  notify-telegram:
+    runs-on: ubuntu-latest
+    needs:
+      - backend-test
+      - backend-build
+      - backend-analyze
+      - frontend-test
+      - frontend-build
+      - frontend-analyze
+      - docker-push
+    if: always()
+
+    steps:
+      - name: Send CI summary to Telegram
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_NOTIFICATION_CHAT_ID: ${{ secrets.TELEGRAM_NOTIFICATION_CHAT_ID }}
+        run: |
+          BODY="ToDoOps CI — ${{ github.repository }} (${{ github.ref_name }})
+          Job results:
+          • backend-test: ${{ needs.backend-test.result }}
+          • backend-build: ${{ needs.backend-build.result }}
+          • backend-analyze: ${{ needs.backend-analyze.result }}
+          • frontend-test: ${{ needs.frontend-test.result }}
+          • frontend-build: ${{ needs.frontend-build.result }}
+          • frontend-analyze: ${{ needs.frontend-analyze.result }}
+          • docker-push: ${{ needs.docker-push.result }}
+          ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          PAYLOAD=$(jq -n --arg chat "$TELEGRAM_NOTIFICATION_CHAT_ID" --arg text "$BODY" \
+            '{chat_id: $chat, text: $text, disable_web_page_preview: true}')
+          curl -sS -f -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+            -H "Content-Type: application/json" \
+            -d "$PAYLOAD"
