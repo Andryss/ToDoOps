@@ -1,0 +1,31 @@
+# Syncs k8s/backend.yaml and k8s/hpa-backend.yaml in one Application (Argo CD ≥ 2.6, spec.sources).
+# Requires Secret todoops-secrets. Apply after Postgres is ready if the backend should connect immediately.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: todoops-backend
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  project: default
+  sources:
+    - repoURL: https://github.com/Andryss/ToDoOps.git
+      targetRevision: HEAD
+      path: k8s
+      directory:
+        include: backend.yaml
+    - repoURL: https://github.com/Andryss/ToDoOps.git
+      targetRevision: HEAD
+      path: k8s
+      directory:
+        include: hpa-backend.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: todoops
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

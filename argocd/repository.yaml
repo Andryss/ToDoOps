@@ -1,0 +1,16 @@
+# Declarative Git repository for Argo CD (Settings → Repositories in the UI).
+# https://argo-cd.readthedocs.io/en/stable/operator-manual/declarative-setup/#repositories
+#
+# Public repo: no username/password. If the repo becomes private, add to stringData:
+#   password: <github-pat-or-token>
+#   username: <github-username-or-token>   # or use username + app token per docs
+apiVersion: v1
+kind: Secret
+metadata:
+  name: repo-github-andryss-todoops
+  namespace: argocd
+  labels:
+    argocd.argoproj.io/secret-type: repository
+stringData:
+  type: git
+  url: https://github.com/Andryss/ToDoOps.git

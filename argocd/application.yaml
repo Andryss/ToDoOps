@@ -1,0 +1,25 @@
+# App-of-apps: root Application that syncs every *.yaml in applications/ (child Applications).
+# Apply after Argo CD install and repository.yaml. From argocd/: kubectl apply -f application.yaml
+# https://argo-cd.readthedocs.io/en/stable/operator-manual/cluster-bootstrapping/
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: todoops-gitops
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/Andryss/ToDoOps.git
+    targetRevision: HEAD
+    path: argocd/applications
+    directory:
+      include: "*.yaml"
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

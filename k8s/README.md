@@ -1,6 +1,6 @@
 # Kubernetes
 
-Manifests deploy **PostgreSQL** (StatefulSet), **backend**, **frontend**, **HPA** on the backend, **monitoring** via **[kube-prometheus-stack](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack)** (Prometheus Operator, Prometheus, Grafana, Alertmanager, kube-state-metrics, node-exporter, default rules/dashboards), optional **Ingress**, and the **NGINX Ingress Controller** — app and monitoring run in namespace **`todoops`**.
+Manifests deploy **PostgreSQL** (StatefulSet), **backend**, **frontend**, **HPA** on the backend, **monitoring** via **[kube-prometheus-stack](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack)** (Prometheus Operator, Prometheus, Grafana, kube-state-metrics, node-exporter; **Alertmanager** and the chart’s **default `PrometheusRule` set** are turned off in **`monitoring-values.yaml`**), optional **Ingress**, and the **NGINX Ingress Controller** — app and monitoring run in namespace **`todoops`**.
 
 The stack is the standard **prometheus-community** chart described on [Artifact Hub](https://artifacthub.io/packages/helm/prometheus-community/kube-prometheus-stack); it installs cluster-wide **CRDs** (for example `ServiceMonitor`) on first install.
 
@@ -67,7 +67,7 @@ If you change the Helm release name from **`monitoring`**, edit the **`release`*
 kubectl get svc -n todoops -l app.kubernetes.io/name=grafana -o wide -w
 ```
 
-Open **`http://<GRAFANA_EXTERNAL_IP>`** and sign in with **`GRAFANA_ADMIN_USER`** / **`GRAFANA_ADMIN_PASSWORD`** from **`secret.yaml`**. The chart wires Grafana to the in-cluster Prometheus datasource and ships Kubernetes dashboards; the **`grafana-dashboard/`** apply adds **ToDoOps Backend — HTTP (RPS, errors, latency)**.
+Open **`http://<GRAFANA_EXTERNAL_IP>`** and sign in with **`GRAFANA_ADMIN_USER`** / **`GRAFANA_ADMIN_PASSWORD`** from **`secret.yaml`**. The chart wires Grafana to the in-cluster Prometheus datasource; **`grafana-dashboard/`** (Kustomize) adds **ToDoOps Backend — HTTP (RPS, errors, latency)**.
 
 **Prometheus** in this chart is typically **ClusterIP** (for example **`monitoring-kube-prometheus-stack-prometheus`**); use Grafana or port-forward for the Prometheus UI.
 
@@ -109,6 +109,24 @@ kubectl apply -f ingress.yaml
 ```
 
 Open **`http://<INGRESS_CONTROLLER_EXTERNAL_IP>`** for the web app. You can set **`rules[].host`** in **`ingress.yaml`** when DNS is available.
+
+### Port forwarding (any Service)
+
+Pattern:
+
+```bash
+kubectl port-forward -n <namespace> svc/<service-name> <local-port>:<service-port>
+```
+
+Examples in **`todoops`** (use **`kubectl get svc -n todoops`** if names or ports differ):
+
+| Service | Example | Open |
+|---------|---------|------|
+| **Grafana** | `kubectl port-forward -n todoops svc/monitoring-grafana 3000:80` | http://localhost:3000 |
+| **Frontend** | `kubectl port-forward -n todoops svc/frontend 8081:80` | http://localhost:8081 |
+| **ingress-nginx** | `kubectl port-forward -n todoops svc/ingress-nginx-controller 8082:80` | http://localhost:8082 |
+
+Stop with Ctrl+C.
 
 ## Remove everything in `todoops`
 

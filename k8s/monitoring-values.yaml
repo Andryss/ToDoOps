@@ -1,7 +1,15 @@
-# Values for prometheus-community/kube-prometheus-stack (Prometheus Operator + Prometheus + Grafana + Alertmanager + kube-state-metrics + node-exporter, etc.).
+# Values for prometheus-community/kube-prometheus-stack (Prometheus Operator + Prometheus + Grafana + kube-state-metrics + node-exporter, etc.).
 # Chart: https://artifacthub.io/packages/helm/prometheus-community/kube-prometheus-stack
 # Install: helm upgrade --install monitoring prometheus-community/kube-prometheus-stack -n todoops -f monitoring-values.yaml
 # Grafana reads admin credentials from todoops-secrets (apply secret.yaml before or with this release).
+
+# No cluster-wide PrometheusRule pack from the chart (custom rules only if you add them separately).
+defaultRules:
+  create: false
+
+# Do not deploy Alertmanager StatefulSet / Service.
+alertmanager:
+  enabled: false
 
 grafana:
   service:

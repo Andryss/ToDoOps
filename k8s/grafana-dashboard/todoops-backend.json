@@ -35,7 +35,7 @@
       },
       "options": {
         "mode": "markdown",
-        "content": "## HTTP traffic\n\nUse **Backend pods** (top) to filter. **All** = every backend pod. RPS and error rates are **summed** across selected pods per URI. Mean latency is a **weighted average**; p95 merges histograms. See later sections for JVM (heap **avg** per pool), threads (**sum**), Hikari (**sum**/**merged avg**), etc.\n"
+        "content": "## HTTP traffic\n"
       }
     },
     {
@@ -1968,6 +1968,6 @@
   "timezone": "browser",
   "title": "ToDoOps Backend — Application dashboard",
   "uid": "todoops-backend",
-  "version": 2,
+  "version": 3,
   "weekStart": ""
 }

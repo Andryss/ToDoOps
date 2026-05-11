@@ -1,0 +1,33 @@
+# kube-prometheus-stack (Prometheus Operator, Prometheus, Grafana, kube-state-metrics, node-exporter, …).
+# Values: k8s/monitoring-values.yaml (Alertmanager + default chart rules disabled).
+# Argo CD ≥ 2.6 (spec.sources). Helm release name "monitoring" must match ServiceMonitor label release: monitoring.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: todoops-monitoring
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  project: default
+  sources:
+    - repoURL: https://prometheus-community.github.io/helm-charts
+      chart: kube-prometheus-stack
+      targetRevision: "65.8.1"
+      helm:
+        releaseName: monitoring
+        valueFiles:
+          - $values/k8s/monitoring-values.yaml
+    - repoURL: https://github.com/Andryss/ToDoOps.git
+      targetRevision: HEAD
+      ref: values
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: todoops
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true

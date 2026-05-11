@@ -1,0 +1,27 @@
+# ServiceMonitor (backend Actuator) + Grafana dashboard ConfigMap (Kustomize).
+# Requires todoops-monitoring (Prometheus Operator + Grafana). Argo CD ≥ 2.6 (spec.sources).
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: todoops-monitoring-extension
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+spec:
+  project: default
+  sources:
+    - repoURL: https://github.com/Andryss/ToDoOps.git
+      targetRevision: HEAD
+      path: k8s
+      directory:
+        include: servicemonitor-backend.yaml
+    - repoURL: https://github.com/Andryss/ToDoOps.git
+      targetRevision: HEAD
+      path: k8s/grafana-dashboard
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: todoops
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
