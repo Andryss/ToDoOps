@@ -18,13 +18,13 @@ You need **container images** for backend and frontend in a registry the cluster
 
 ## Configure and apply
 
+Create **`secret.yaml`** from the template (it is not committed; **`secret.yaml`** is gitignored):
+
 ```bash
 cp secret.example.yaml secret.yaml
-cp backend.example.yaml backend.yaml
-cp frontend.example.yaml frontend.yaml
 ```
 
-**`secret.yaml`** must define Postgres credentials, matching **`SPRING_DATASOURCE_*`** for the backend, and **`GRAFANA_ADMIN_USER`** / **`GRAFANA_ADMIN_PASSWORD`** for Grafana (used by the chart via **`monitoring-values.yaml`**). **`backend.yaml`** / **`frontend.yaml`** need your image references instead of placeholders.
+Edit **`secret.yaml`** with Postgres credentials (matching **`SPRING_DATASOURCE_*`** for the backend) and **`GRAFANA_ADMIN_USER`** / **`GRAFANA_ADMIN_PASSWORD`** for Grafana (used by the chart via **`monitoring-values.yaml`**). **`backend.yaml`** and **`frontend.yaml`** are versioned in this directory; ensure **container `image`** values point at registry paths your cluster can pull.
 
 ### 1. Namespace
 

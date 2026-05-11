@@ -1,7 +1,4 @@
-# Example frontend manifest. Copy to frontend.yaml and replace YOUR_DOCKERHUB_USER with your image registry path.
-#   cp frontend.example.yaml frontend.yaml
-#   # Edit frontend.yaml: set image to e.g. youruser/todoops-frontend:latest
----
+# --- Frontend Deployment: Nginx serving static app; proxy /api/v1 to backend.
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -21,15 +18,17 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: YOUR_DOCKERHUB_USER/todoops-frontend:latest
+          image: andryss/todoops-frontend:latest
           ports:
             - containerPort: 80
           env:
+            # Same namespace Service as backend (matches Service selector app=backend for Prometheus)
             - name: BACKEND_URL
               value: "http://backend.todoops.svc.cluster.local:8080"
             - name: API_LOCATION
               value: "/api/v1"
 ---
+# --- Frontend Service: internal DNS name "frontend"; optional type: LoadBalancer for external access.
 apiVersion: v1
 kind: Service
 metadata:
