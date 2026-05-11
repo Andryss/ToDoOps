@@ -20,7 +20,7 @@ spec:
         - name: frontend
           image: andryss/todoops-frontend:latest
           ports:
-            - containerPort: 80
+            - containerPort: 8080
           env:
             # Same namespace Service as backend (matches Service selector app=backend for Prometheus)
             - name: BACKEND_URL
@@ -41,4 +41,4 @@ spec:
     app: frontend
   ports:
     - port: 80
-      targetPort: 80
+      targetPort: 8080
