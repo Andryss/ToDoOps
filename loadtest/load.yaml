@@ -43,10 +43,10 @@ pandora:
         rps:
           - type: line
             from: 5
-            to: 30
+            to: 100
             duration: 10m
           - type: const
-            ops: 30
+            ops: 100
             duration: 10m
         # true: жёсткое расписание RPS, длительность теста предсказуема; опоздавшие запросы отбрасываются (см. discard overflow в Pandora).
         discard_overflow: true
