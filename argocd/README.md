@@ -188,17 +188,9 @@ Press Ctrl+C when **EXTERNAL-IP** is set. Check controller pods:
 kubectl get pods -n todoops -l app.kubernetes.io/name=ingress-nginx
 ```
 
-## External IPs: Grafana and Ingress
+## External IP: ingress-nginx (app + Grafana)
 
 After **`todoops-monitoring`** and **`todoops-ingress`** are healthy, use the same checks as **`../k8s/README.md`** §2–§3.
-
-**Grafana** (LoadBalancer from **`monitoring-values.yaml`**; Service name is usually **`monitoring-grafana`** for release **`monitoring`**):
-
-```bash
-kubectl get svc -n todoops -l app.kubernetes.io/name=grafana -o wide -w
-```
-
-Open **`http://<GRAFANA_EXTERNAL_IP>`** and sign in with **`GRAFANA_ADMIN_USER`** / **`GRAFANA_ADMIN_PASSWORD`** from **`todoops-secrets`**.
 
 **Ingress (NGINX)** — controller Service **`ingress-nginx-controller`**:
 
@@ -206,7 +198,7 @@ Open **`http://<GRAFANA_EXTERNAL_IP>`** and sign in with **`GRAFANA_ADMIN_USER`*
 kubectl get svc -n todoops ingress-nginx-controller -o wide -w
 ```
 
-Open **`http://<INGRESS_CONTROLLER_EXTERNAL_IP>`** for the app (**`ingress.yaml`** routes **`/`** to the frontend).
+Open **`http://<INGRESS_CONTROLLER_EXTERNAL_IP>`** for the app (**`ingress.yaml`** routes **`/`** to the frontend) and **`http://<INGRESS_CONTROLLER_EXTERNAL_IP>/grafana/`** for Grafana (ClusterIP **`monitoring-grafana`**; subpath configured in **`monitoring-values.yaml`**). Sign in with **`GRAFANA_ADMIN_USER`** / **`GRAFANA_ADMIN_PASSWORD`** from **`todoops-secrets`**.
 
 ## Port forwarding (unified pattern)
 
@@ -219,9 +211,9 @@ kubectl port-forward -n <namespace> svc/<service-name> <local-port>:<service-por
 | What | Example |
 |------|---------|
 | **Argo CD UI** (HTTPS on the Service) | `kubectl port-forward -n argocd svc/argocd-server 8080:443` → **https://localhost:8080** |
-| **Grafana** (HTTP, chart release **`monitoring`**) | `kubectl port-forward -n todoops svc/monitoring-grafana 3000:80` → **http://localhost:3000** |
+| **Grafana** (direct Service; use **`/grafana/`** subpath) | `kubectl port-forward -n todoops svc/monitoring-grafana 3000:80` → **http://localhost:3000/grafana/** |
 | **Frontend** (Service **`frontend`**, port **80** → pods on **8080**) | `kubectl port-forward -n todoops svc/frontend 8081:80` → **http://localhost:8081** |
-| **ingress-nginx** (HTTP to the controller) | `kubectl port-forward -n todoops svc/ingress-nginx-controller 8082:80` → **http://localhost:8082** |
+| **ingress-nginx** (app + Grafana via Ingress) | `kubectl port-forward -n todoops svc/ingress-nginx-controller 8082:80` → **http://localhost:8082** and **http://localhost:8082/grafana/** |
 
 If a Service name differs (e.g. custom Helm release), run **`kubectl get svc -n todoops`** and substitute **`service-name`** / **`service-port`** from the **`PORT(S)`** column. Stop with Ctrl+C.
 

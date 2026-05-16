@@ -14,7 +14,7 @@ terraform output -raw k8s_cluster_id
 yc managed-kubernetes cluster get-credentials <cluster_id> --external
 ```
 
-You need **container images** for backend and frontend in a registry the cluster can pull from. The cluster service account needs **`load-balancer.admin`** for Grafana and Ingress external IPs (see Terraform **`iam.tf`**).
+You need **container images** for backend and frontend in a registry the cluster can pull from. The cluster service account needs **`load-balancer.admin`** for the ingress-nginx external IP (see Terraform **`iam.tf`**).
 
 ## Configure and apply
 
@@ -61,13 +61,7 @@ kubectl apply -k grafana-dashboard/
 
 If you change the Helm release name from **`monitoring`**, edit the **`release`** label in **`servicemonitor-backend.yaml`** to the same name so Prometheus picks up this `ServiceMonitor`.
 
-**Grafana** is exposed as a **LoadBalancer** by **`monitoring-values.yaml`**. List its Service (name is usually **`monitoring-grafana`**, matching the Helm release name) and wait for **EXTERNAL-IP**:
-
-```bash
-kubectl get svc -n todoops -l app.kubernetes.io/name=grafana -o wide -w
-```
-
-Open **`http://<GRAFANA_EXTERNAL_IP>`** and sign in with **`GRAFANA_ADMIN_USER`** / **`GRAFANA_ADMIN_PASSWORD`** from **`secret.yaml`**. The chart wires Grafana to the in-cluster Prometheus datasource; **`grafana-dashboard/`** (Kustomize) adds **ToDoOps Backend — HTTP (RPS, errors, latency)**.
+**Grafana** runs as **ClusterIP** (**`monitoring-grafana`**, release **`monitoring`**) with **`serve_from_sub_path`** and **`root_url`** under **`/grafana`** in **`monitoring-values.yaml`**. After you install ingress (§3), open **`http://<INGRESS_CONTROLLER_EXTERNAL_IP>/grafana/`** and sign in with **`GRAFANA_ADMIN_USER`** / **`GRAFANA_ADMIN_PASSWORD`** from **`secret.yaml`**. The chart wires Grafana to the in-cluster Prometheus datasource; **`grafana-dashboard/`** (Kustomize) adds **ToDoOps Backend — HTTP (RPS, errors, latency)**.
 
 **Prometheus** in this chart is typically **ClusterIP** (for example **`monitoring-kube-prometheus-stack-prometheus`**); use Grafana or port-forward for the Prometheus UI.
 
@@ -102,13 +96,13 @@ Press Ctrl+C when the address appears. Check controller pods:
 kubectl get pods -n todoops -l app.kubernetes.io/name=ingress-nginx
 ```
 
-Apply the ToDoOps **Ingress** (routes **`/`** to the frontend; frontend proxies **`/api/v1`** to the backend):
+Apply the ToDoOps **Ingress** (routes **`/grafana`** to Grafana, **`/`** to the frontend; frontend proxies **`/api/v1`** to the backend):
 
 ```bash
 kubectl apply -f ingress.yaml
 ```
 
-Open **`http://<INGRESS_CONTROLLER_EXTERNAL_IP>`** for the web app. You can set **`rules[].host`** in **`ingress.yaml`** when DNS is available.
+Open **`http://<INGRESS_CONTROLLER_EXTERNAL_IP>`** for the web app and **`http://<INGRESS_CONTROLLER_EXTERNAL_IP>/grafana/`** for Grafana. You can set **`rules[].host`** in **`ingress.yaml`** when DNS is available.
 
 ### Port forwarding (any Service)
 
@@ -122,9 +116,9 @@ Examples in **`todoops`** (use **`kubectl get svc -n todoops`** if names or port
 
 | Service | Example | Open |
 |---------|---------|------|
-| **Grafana** | `kubectl port-forward -n todoops svc/monitoring-grafana 3000:80` | http://localhost:3000 |
+| **Grafana** (direct Service; use **`/grafana/`** subpath) | `kubectl port-forward -n todoops svc/monitoring-grafana 3000:80` | http://localhost:3000/grafana/ |
 | **Frontend** | `kubectl port-forward -n todoops svc/frontend 8081:80` | http://localhost:8081 |
-| **ingress-nginx** | `kubectl port-forward -n todoops svc/ingress-nginx-controller 8082:80` | http://localhost:8082 |
+| **ingress-nginx** (app + Grafana via Ingress) | `kubectl port-forward -n todoops svc/ingress-nginx-controller 8082:80` | http://localhost:8082 and http://localhost:8082/grafana/ |
 
 Stop with Ctrl+C.
 

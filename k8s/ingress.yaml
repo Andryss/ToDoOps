@@ -1,4 +1,4 @@
-# Ingress: routes HTTP traffic to the frontend (which proxies /api/v1 to the backend).
+# Ingress: /grafana → Grafana (subpath in monitoring-values.yaml); / → frontend (/api/v1 proxied to backend).
 # Apply after the NGINX Ingress Controller is installed (see k8s/README.md §3).
 # Yandex NLB + ingress-nginx: https://yandex.cloud/en/docs/managed-kubernetes/operations/create-load-balancer-with-ingress-nginx
 apiVersion: networking.k8s.io/v1
@@ -14,6 +14,13 @@ spec:
     # No host = match any host (access via http://<EXTERNAL-IP>). Add host: "your-domain.com" when you have DNS.
     - http:
         paths:
+          - path: /grafana
+            pathType: Prefix
+            backend:
+              service:
+                name: monitoring-grafana
+                port:
+                  number: 80
           - path: /
             pathType: Prefix
             backend:

@@ -1,6 +1,6 @@
 services:
   sonarqube:
-    image: sonarqube:community
+    image: sonarqube:26.5.0.122743-community
     depends_on:
       db:
         condition: service_healthy
